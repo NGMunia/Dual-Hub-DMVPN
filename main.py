@@ -12,7 +12,7 @@ Configuring Cryptography
 url1  = 'http://10.1.30.100:8000/Devices/R3_BR3/Configure/Cryptography'
 
 data1 = {'policy_number': 100}
-result= requests.post(url1, json=data)
+result= requests.post(url1, json=data1)
 if result.status_code == 201:
     rp('Response:',result.status_code,'\n',result.json())
 else:
@@ -78,7 +78,7 @@ else:
 
 
 '''
-Configuring NAT 
+Configuring NAT
 '''
 url5  = 'http://10.1.30.100:8000/Devices/R1_BR1/Configure/NAT'
 
