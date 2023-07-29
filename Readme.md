@@ -1,4 +1,4 @@
-DUAL HUB DUAL CLOUD DMVPN WITH IPSEC:
+DUAL-HUB/CLOUD DMVPN WITH IPSEC:
 -----------------------------------------------------------------------------------------
 
   - EIGRP is used for reachability among the Branches and HQ
@@ -25,6 +25,10 @@ DUAL HUB DUAL CLOUD DMVPN WITH IPSEC:
   
   - Each branch site has its own Internet connection
 
+  - Image(s) used:
+      - vios-adventerprisek9-m.vmdk.SPA.156-2.T
+      - Ubuntu Desktop
+
           
         
 JINJA:
@@ -47,7 +51,7 @@ Example:
     ip address {{Address}} {{Netmask}}
     no shut
 
-Passing Data to the Template:
+##Passing Data to the Template##
 - When rendering a Jinja2 template, you provide a dictionary or an object containing the 
   data you want to use for variable substitution. 
 - The keys in the dictionary correspond to the variable names in the template.
@@ -55,8 +59,8 @@ Passing Data to the Template:
   corresponding values from the data dictionary.
 
 The Environment class in Jinja2  manages the template configurations, including:
-1. template loading:  It knows where to find your templates 
-2. rendering: It knows how to take your templates and replace the placeholders with the actual values you provide
+- template loading:  It knows where to find your templates 
+- rendering: It knows how to take your templates and replace the placeholders with the actual values you provide
 
 The FileSystemLoader is a template loader in Jinja2 that loads templates from the file system. 
 It searches for templates in a specified directory on the file system and loads them when requested.
