@@ -1,0 +1,8 @@
+interface {{Inside_intf}}
+ip nat inside 
+interface {{Outside_intf}}
+ip nat outside 
+ip access-list standard nat_acl
+permit {{NATed_IP_address}} {{Wildcard_Mask}}
+exit
+ip nat inside source list nat_acl interface {{Outside_intf}} overload

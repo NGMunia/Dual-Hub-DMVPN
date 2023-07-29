@@ -1,0 +1,7 @@
+ip access-list extended SNMP_ACL
+permit udp host {{Server_IP}} any eq 161
+exit
+snmp-server community {{SNMP_password}} ro SNMP_ACL
+snmp-server system-shutdown
+snmp-server enable traps config
+snmp-server host {{Server_IP}} traps version 2c {{SNMP_password}}
