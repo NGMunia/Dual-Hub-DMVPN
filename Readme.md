@@ -9,8 +9,8 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
       - Jinja2 has been used as a framework to construct configuration templates.
       - FastAPI has been used to construct simple REST-APIs as the NBI
       - Netmiko leverages SSH as its SBI to interact with network devices.
-      - REST-APIs are enabled for the folloing tasks:
-          - IPsec Crytography variables
+      - REST-APIs are enabled for the following tasks:
+          - IPsec Cryptography variables
           - DHCP
           - Interface configuration
           - Spoke tunnel Configuration
@@ -20,7 +20,7 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
           - Backing up running configs
           - Inventory that Device information collection and Documentation.
 
-  - IPSLA with object tracking has been configured on R1-LAN to track defualt route
+  - IPSLA with object tracking has been configured on R1-LAN to track default route
     to the internet with R1-HUB being the preferred default route.
   
   - Each branch site has its own Internet connection
@@ -28,6 +28,7 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
   - Image(s) used:
       - vios-adventerprisek9-m.vmdk.SPA.156-2.T
       - Ubuntu Desktop
+      - Webterm docker
 
           
         
