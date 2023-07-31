@@ -1,9 +1,7 @@
 Building configuration...
 
   
-Current configuration : 5601 bytes
-!
-! Last configuration change at 17:38:43 GMT Sat Jul 29 2023 by Automation
+Current configuration : 6059 bytes
 !
 version 15.6
 service timestamps debug datetime localtime year
@@ -73,6 +71,22 @@ redundancy
 no cdp log mismatch duplex
 !
 ip tcp synwait-time 5
+!
+class-map type inspect match-any In_Out_class
+ match protocol https
+ match protocol dns
+ match protocol icmp
+!
+policy-map type inspect In_out_Policy
+ class type inspect In_Out_class
+  inspect 
+ class class-default
+  drop
+!
+zone security Inside
+zone security Outside
+zone-pair security In_Out_Zone source Inside destination Outside
+ service-policy type inspect In_out_Policy
 ! 
 !
 !
@@ -107,6 +121,7 @@ interface Tunnel10
  ip nhrp authentication dmvpn1
  ip nhrp network-id 10
  ip nhrp nhs 172.16.0.1 nbma 32.19.86.2 multicast
+ zone-member security Inside
  ip tcp adjust-mss 1360
  delay 1
  tunnel source GigabitEthernet0/1
@@ -122,6 +137,7 @@ interface Tunnel20
  ip nhrp authentication dmvpn2
  ip nhrp network-id 20
  ip nhrp nhs 172.17.0.1 nbma 44.67.28.2 multicast
+ zone-member security Inside
  ip tcp adjust-mss 1360
  delay 1
  tunnel source GigabitEthernet0/1
@@ -136,6 +152,7 @@ interface GigabitEthernet0/0
  ip flow egress
  ip nat inside
  ip virtual-reassembly in
+ zone-member security Inside
  duplex auto
  speed auto
  media-type rj45
@@ -144,6 +161,7 @@ interface GigabitEthernet0/1
  ip address 56.57.58.2 255.255.255.252
  ip nat outside
  ip virtual-reassembly in
+ zone-member security Outside
  duplex auto
  speed auto
  media-type rj45
@@ -170,6 +188,7 @@ router eigrp 100
 !
 ip forward-protocol nd
 !
+ip flow-export source GigabitEthernet0/0
 ip flow-export version 9
 ip flow-export destination 10.1.20.100 9996
 ip flow-top-talkers

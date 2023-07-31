@@ -15,6 +15,7 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
           - Interface configuration
           - Spoke tunnel Configuration
           - SNMP,NetFlow, NTP, NAT
+          - Zone-based Firewall
           
       - Python scripts have been written for the follwing tasks:
           - Backing up running configs

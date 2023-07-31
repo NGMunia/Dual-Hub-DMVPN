@@ -1,4 +1,5 @@
 ip flow-export version 9
+ip flow-export source {{Flow_Interface}}
 ip flow-export destination {{Server_IP}} {{UDP_Port}}
 interface {{Flow_Interface}}
 ip nbar protocol-discovery

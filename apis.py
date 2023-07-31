@@ -208,7 +208,27 @@ def SNMPconfig(post: SNMPclass, Device_ID: str):
     return result.splitlines()   
 
 
+'''
+Zone-based Firewall
+'''
+class ZBFclass(BaseModel):
+    protocol_list : list
+    Inside_intf : list
+    Outside_intf : list
+@app.post('/Devices/{Device_ID}/Configure/ZBF', status_code = status.HTTP_201_CREATED)
+def ZBFconfig(post: ZBFclass, Device_ID: str):
+    device = Routers[Device_ID]
+    conn = ConnectHandler(**device)
+    conn.enable()
 
+    variables = {'protocol_list': post.protocol_list, 'Inside_intf': post.Inside_intf, 
+                 'Outside_intf': post.Outside_intf}
+    env = Environment(loader=FileSystemLoader('/home/munia/Dual-Hub-DMVPN/Jinja_templates'))
+    template = env.get_template('ZBF.j2')
 
-
+    commands = template.render(variables)
+    result  = conn.send_config_set(commands.splitlines())
+    conn.save_config()
+    conn.disconnect()
+    return result.splitlines()
 

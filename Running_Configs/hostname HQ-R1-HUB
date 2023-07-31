@@ -1,10 +1,9 @@
 Building configuration...
 
   
-Current configuration : 4990 bytes
+Current configuration : 5402 bytes
 !
-! Last configuration change at 17:37:08 GMT Sat Jul 29 2023 by Automation
-! NVRAM config last updated at 17:37:08 GMT Sat Jul 29 2023 by Automation
+! Last configuration change at 18:36:05 GMT Mon Jul 31 2023 by Automation
 !
 version 15.6
 service timestamps debug datetime localtime year
@@ -67,6 +66,23 @@ redundancy
 no cdp log mismatch duplex
 !
 ip tcp synwait-time 5
+!
+class-map type inspect match-any In_Out_Class
+ match protocol https
+ match protocol http
+ match protocol udp
+ match protocol icmp
+!
+policy-map type inspect In_Out_Policy
+ class type inspect In_Out_Class
+  inspect 
+ class class-default
+  drop
+!
+zone security Inside
+zone security Outside
+zone-pair security In_out_Zone source Inside destination Outside
+ service-policy type inspect In_Out_Policy
 ! 
 !
 !
@@ -103,6 +119,7 @@ interface Tunnel10
  ip nhrp authentication dmvpn1
  ip nhrp map multicast dynamic
  ip nhrp network-id 10
+ zone-member security Inside
  ip tcp adjust-mss 1360
  delay 1
  tunnel source GigabitEthernet0/1
@@ -114,6 +131,7 @@ interface GigabitEthernet0/0
  ip address 10.1.1.2 255.255.255.252
  ip nat inside
  ip virtual-reassembly in
+ zone-member security Inside
  ip summary-address eigrp 100 192.168.0.0 255.255.224.0
  duplex auto
  speed auto
@@ -124,6 +142,7 @@ interface GigabitEthernet0/1
  ip address 32.19.86.2 255.255.255.252
  ip nat outside
  ip virtual-reassembly in
+ zone-member security Outside
  duplex auto
  speed auto
  media-type rj45
@@ -157,7 +176,7 @@ ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1 32.19.86.1
 ip ssh version 2
 !
 ip access-list standard nat_acl
- permit 10.1.30.0 0.0.0.255
+ permit 10.1.16.0 0.0.15.255
 !
 ip access-list extended SNMP_ACL
  permit udp host 10.1.20.100 any eq snmp
