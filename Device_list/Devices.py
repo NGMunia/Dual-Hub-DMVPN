@@ -26,20 +26,20 @@ Routers = {
                          'username':'Automation',
                          'password':'cisco123',
                          'secret':'cisco123',
-                         'ip':'172.16.0.2'
+                         'ip':'192.168.10.1'
                        },
              'R2_BR2': {
                          'device_type':'cisco_ios',
                          'username':'Automation',
                          'password':'cisco123',
                          'secret':'cisco123',
-                         'ip':'172.16.0.3'
+                         'ip':'192.168.20.1'
                        }, 
              'R3_BR3': {
                          'device_type':'cisco_ios',
                          'username':'Automation',
                          'password':'cisco123',
                          'secret':'cisco123',
-                         'ip':'172.16.0.4'
+                         'ip':'192.168.30.1'
                        }               
           }

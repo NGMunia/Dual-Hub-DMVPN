@@ -1,7 +1,9 @@
 Building configuration...
 
   
-Current configuration : 4334 bytes
+Current configuration : 4409 bytes
+!
+! Last configuration change at 19:55:22 GMT Tue Aug 1 2023 by Automation
 !
 version 15.6
 service timestamps debug datetime localtime year
@@ -130,7 +132,7 @@ ip access-list extended SNMP_ACL
  permit udp host 10.1.20.100 any eq snmp
 !
 ip sla 1
- icmp-echo 32.19.86.2 source-ip 10.1.30.1
+ icmp-echo 32.19.86.1 source-ip 10.1.30.1
  frequency 10
 ip sla schedule 1 life forever start-time now
 !
