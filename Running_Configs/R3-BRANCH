@@ -1,7 +1,7 @@
 Building configuration...
 
   
-Current configuration : 6124 bytes
+Current configuration : 6127 bytes
 !
 version 15.6
 service timestamps debug datetime localtime year
@@ -14,7 +14,7 @@ boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$Uun1$gjz1m14nFrjwa7GNVAwbN.
+enable secret 5 $1$vRE/$cfmfl7QQTypRpyrAwQmMn0
 !
 aaa new-model
 !
@@ -64,7 +64,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 5 $1$SPVl$5kQa8j42uOwXVbkvPkk0W0
+username Automation secret 5 $1$08i1$fpMIsvUDpV0ePFlxnmQkc1
 !
 redundancy
 !
@@ -192,7 +192,6 @@ ip forward-protocol nd
 ip flow-export source GigabitEthernet0/0
 ip flow-export version 9
 ip flow-export destination 10.1.20.100 9998
-ip flow-export destination 10.1.20.100 9997
 ip flow-top-talkers
  top 5
  sort-by bytes
@@ -221,7 +220,7 @@ snmp-server host 10.1.20.100 version 2c device_snmp
 !
 control-plane
 !
-banner exec ^C
+banner exec ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *
@@ -230,7 +229,7 @@ banner exec ^C
 * purposes is expressly prohibited except as otherwise authorized by     *
 * Cisco in writing.                                                      *
 **************************************************************************^C
-banner incoming ^C
+banner incoming ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *
@@ -239,7 +238,7 @@ banner incoming ^C
 * purposes is expressly prohibited except as otherwise authorized by     *
 * Cisco in writing.                                                      *
 **************************************************************************^C
-banner login ^C
+banner login ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *

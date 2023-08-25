@@ -28,7 +28,8 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
 
   - Image(s) used:
       - vios-adventerprisek9-m.vmdk.SPA.156-2.T
-      - Ubuntu Desktop
+      - Ubuntu Desktop VM
+      - Windows server QEMU VM
       - Webterm docker
 
           

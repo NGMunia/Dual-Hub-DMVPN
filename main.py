@@ -124,7 +124,7 @@ Backing up Running configs
 for Devices in Routers.values():
     conn = ConnectHandler(**Devices)
     conn.enable()
-    host = conn.send_command('show run | include hostname')
+    host = conn.send_command('show version',use_textfsm=True)[0]['hostname']
     output = conn.send_command('show run')
     with open (f'/home/munia/Dual-Hub-DMVPN/Running_Configs/{host}','w')as f:
         f.write(output)

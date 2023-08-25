@@ -1,20 +1,22 @@
 Building configuration...
 
   
-Current configuration : 6059 bytes
+Current configuration : 5453 bytes
+!
+! No configuration change since last restart
 !
 version 15.6
 service timestamps debug datetime localtime year
 service timestamps log datetime localtime year
 no service password-encryption
 !
-hostname R1-BRANCH
+hostname HQ-R2-HUB
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$TiP.$pWAjSIeK7xkLiyg6ZvZYf1
+enable secret 5 $1$VaLR$urg4tRBu0vXlLb6FH5tCQ/
 !
 aaa new-model
 !
@@ -30,6 +32,7 @@ ethernet lmi ce
 !
 !
 !
+no process cpu autoprofile hog
 clock timezone GMT 3 0
 mmi polling-interval 60
 no mmi auto-configure
@@ -44,18 +47,11 @@ no ip icmp rate-limit unreachable
 !
 !
 !
-ip dhcp excluded-address 192.168.10.1 192.168.10.10
-!
-ip dhcp pool BRANCH-1-LAN-DHCP
- network 192.168.10.0 255.255.255.0
- default-router 192.168.10.1 
- dns-server 208.67.222.123 208.67.220.123 
 !
 !
 !
-ip flow-cache timeout active 1
-no ip domain lookup
 ip domain name abc.com
+ip name-server 8.8.8.8
 ip cef
 no ipv6 cef
 !
@@ -64,29 +60,31 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 5 $1$WGRm$W/Pw6OO4kGX.rWHiwxjmg1
+username Automation secret 5 $1$Bjno$xQ8QulsTTHBttWMJHMYna0
 !
 redundancy
 !
 no cdp log mismatch duplex
+no cdp run
 !
 ip tcp synwait-time 5
 !
-class-map type inspect match-any In_Out_class
+class-map type inspect match-any In_Out_Class
+ match protocol http
  match protocol https
- match protocol dns
  match protocol icmp
+ match protocol udp
 !
-policy-map type inspect In_out_Policy
- class type inspect In_Out_class
+policy-map type inspect In_Out_Policy
+ class type inspect In_Out_Class
   inspect 
  class class-default
   drop
 !
 zone security Inside
 zone security Outside
-zone-pair security In_Out_Zone source Inside destination Outside
- service-policy type inspect In_out_Policy
+zone-pair security In_out_Zone source Inside destination Outside
+ service-policy type inspect In_Out_Policy
 ! 
 !
 !
@@ -113,58 +111,44 @@ crypto ipsec profile crypto_profile
 !
 !
 !
-interface Tunnel10
- description DMVPN-1-TUNNEL
- ip address 172.16.0.2 255.255.255.0
- no ip redirects
- ip mtu 1400
- ip nhrp authentication dmvpn1
- ip nhrp network-id 10
- ip nhrp nhs 172.16.0.1 nbma 32.19.86.2 multicast
- zone-member security Inside
- ip tcp adjust-mss 1360
- delay 1
- tunnel source GigabitEthernet0/1
- tunnel mode gre multipoint
- tunnel key 10
- tunnel protection ipsec profile crypto_profile shared
-!
 interface Tunnel20
  description DMVPN-2-TUNNEL
- ip address 172.17.0.2 255.255.255.0
+ ip address 172.17.0.1 255.255.255.0
  no ip redirects
  ip mtu 1400
+ no ip next-hop-self eigrp 100
+ no ip split-horizon eigrp 100
  ip nhrp authentication dmvpn2
+ ip nhrp map multicast dynamic
  ip nhrp network-id 20
- ip nhrp nhs 172.17.0.1 nbma 44.67.28.2 multicast
  zone-member security Inside
  ip tcp adjust-mss 1360
  delay 1
  tunnel source GigabitEthernet0/1
  tunnel mode gre multipoint
  tunnel key 20
- tunnel protection ipsec profile crypto_profile shared
+ tunnel protection ipsec profile crypto_profile
 !
 interface GigabitEthernet0/0
- ip address 192.168.10.1 255.255.255.0
- ip nbar protocol-discovery
- ip flow ingress
- ip flow egress
+ ip address 10.1.1.6 255.255.255.252
  ip nat inside
  ip virtual-reassembly in
  zone-member security Inside
+ ip summary-address eigrp 100 192.168.0.0 255.255.224.0
  duplex auto
  speed auto
  media-type rj45
+ no cdp enable
 !
 interface GigabitEthernet0/1
- ip address 56.57.58.2 255.255.255.252
+ ip address 44.67.28.2 255.255.255.252
  ip nat outside
  ip virtual-reassembly in
  zone-member security Outside
  duplex auto
  speed auto
  media-type rj45
+ no cdp enable
 !
 interface GigabitEthernet0/2
  no ip address
@@ -172,6 +156,7 @@ interface GigabitEthernet0/2
  duplex auto
  speed auto
  media-type rj45
+ no cdp enable
 !
 interface GigabitEthernet0/3
  no ip address
@@ -179,30 +164,24 @@ interface GigabitEthernet0/3
  duplex auto
  speed auto
  media-type rj45
+ no cdp enable
 !
 !
 router eigrp 100
- network 172.16.0.0 0.0.0.255
+ network 10.1.1.0 0.0.0.255
  network 172.17.0.0 0.0.0.255
- network 192.168.10.0
 !
 ip forward-protocol nd
 !
-ip flow-export source GigabitEthernet0/0
-ip flow-export version 9
-ip flow-export destination 10.1.20.100 9996
-ip flow-top-talkers
- top 5
- sort-by bytes
 !
 no ip http server
 no ip http secure-server
 ip nat inside source list nat_acl interface GigabitEthernet0/1 overload
-ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1 56.57.58.1
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/1 44.67.28.1
 ip ssh version 2
 !
 ip access-list standard nat_acl
- permit 192.168.10.0 0.0.0.255
+ permit 10.1.16.0 0.0.15.255
 !
 ip access-list extended SNMP_ACL
  permit udp host 10.1.20.100 any eq snmp
@@ -219,7 +198,7 @@ snmp-server host 10.1.20.100 version 2c device_snmp
 !
 control-plane
 !
-banner exec ^C
+banner exec ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *
@@ -228,7 +207,7 @@ banner exec ^C
 * purposes is expressly prohibited except as otherwise authorized by     *
 * Cisco in writing.                                                      *
 **************************************************************************^C
-banner incoming ^C
+banner incoming ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *
@@ -237,7 +216,7 @@ banner incoming ^C
 * purposes is expressly prohibited except as otherwise authorized by     *
 * Cisco in writing.                                                      *
 **************************************************************************^C
-banner login ^C
+banner login ^CC
 **************************************************************************
 * IOSv is strictly limited to use for evaluation, demonstration and IOS  *
 * education. IOSv is provided as-is and is not supported by Cisco's      *
@@ -260,6 +239,6 @@ line vty 0 4
 !
 no scheduler allocate
 ntp update-calendar
-ntp server 10.1.30.1
+ntp server ke.pool.ntp.org
 !
 end
