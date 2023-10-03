@@ -25,6 +25,7 @@ DUAL-HUB/CLOUD DMVPN WITH IPSEC:
     to the internet with R1-HUB being the preferred default route.
   
   - Each branch site has its own Internet connection
+  - The windows server Offers service like DHCP, DNS
 
   - Image(s) used:
       - vios-adventerprisek9-m.vmdk.SPA.156-2.T
