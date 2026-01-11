@@ -1,71 +1,98 @@
-DUAL-HUB/CLOUD DMVPN WITH IPSEC:
------------------------------------------------------------------------------------------
+# Dual-Hub / Cloud DMVPN Lab with IPsec
 
-  - EIGRP is used for reachability among the Branches and HQ
-  - The topology leverages EIGRP's ECMP to load-share traffic on both tunnels.
-  - Base configuration for the NBMA/Transoport networks has been done using CLI
-  - IPsec Secures the DMVPN tunnels.
-  - Common (Repetitve) Configurations have been implemented using Automation.
-      - Jinja2 has been used as a framework to construct configuration templates.
-      - FastAPI has been used to construct simple REST-APIs as the NBI
-      - Netmiko leverages SSH as its SBI to interact with network devices.
-      - REST-APIs are enabled for the following tasks:
-          - IPsec Cryptography variables
-          - DHCP
-          - Interface configuration
-          - Spoke tunnel Configuration
-          - SNMP,NetFlow, NTP, NAT
-          - Zone-based Firewall
-          
-      - Python scripts have been written for the follwing tasks:
-          - Backing up running configs
-          - Inventory that Device information collection and Documentation.
+**A professional enterprise WAN lab demonstrating advanced DMVPN, IPsec security, EIGRP routing, automation, and network monitoring.**  
+Designed to showcase real-world enterprise connectivity, resiliency, and automation practices.
 
-  - IPSLA with object tracking has been configured on R1-LAN to track default route
-    to the internet with R1-HUB being the preferred default route.
-  
-  - Each branch site has its own Internet connection
-  - The windows server Offers centralized services like DHCP, DNS, Network monitoring (using PRTG server)
+![DMVPN](https://img.shields.io/badge/DMVPN-Phase2-blue)
+![IPsec](https://img.shields.io/badge/IPsec-Secure-red)
+![Automation](https://img.shields.io/badge/Automation-Python-green)
+![EIGRP](https://img.shields.io/badge/EIGRP-ECMP-orange)
 
-  - Image(s) used:
-      - vios-adventerprisek9-m.vmdk.SPA.156-2.T
-      - Ubuntu Desktop VM
-      - Windows server 2016 QEMU VM
-      - Webterm docker
+---
+![Topology](/Topology.png)
 
-          
-        
-JINJA:
--------------------------------------------------------------------------------------------
 
-Jinja2 is a templating engine that allows you to create dynamic templates 
-with placeholders for variables.
 
-When combined with network automation tools like Netmiko Jinja2 helps streamline the 
-configuration process for multiple devices.
+## Quick Overview
 
-First, you'll create a Jinja2 template that contains placeholders for the variables 
-you want to use.
+- **Routing:** EIGRP with ECMP for dual-hub traffic load-sharing  
+- **Overlay Security:** IPsec-protected DMVPN tunnels  
+- **Automation:** Python-Netmiko
+- **Monitoring:** PRTG, SNMP, NetFlow  
+- **Services:** Centralized DHCP, DNS, NTP  
 
-To define a variable in a Jinja2 template, you use the {{ }} syntax.
+---
 
-Example: 
-    interface {{Inteface_name}}
-    Description {{Description}}
-    ip address {{Address}} {{Netmask}}
-    no shut
+## Project Objectives
 
-##Passing Data to the Template##
-- When rendering a Jinja2 template, you provide a dictionary or an object containing the 
-  data you want to use for variable substitution. 
-- The keys in the dictionary correspond to the variable names in the template.
-- During template rendering, Jinja2 replaces the variables in the template with their 
-  corresponding values from the data dictionary.
+- Implement a dual-hub DMVPN architecture with branch redundancy  
+- Secure all tunnels using IPsec cryptography  
+- Automate repetitive configurations and device management  
+- Configure service resiliency using IPSLA and object tracking  
+- Deploy centralized network services for branches  
+- Monitor traffic and device health with SNMP and PRTG  
 
-The Environment class in Jinja2  manages the template configurations, including:
-- template loading:  It knows where to find your templates 
-- rendering: It knows how to take your templates and replace the placeholders with the actual values you provide
+---
 
-The FileSystemLoader is a template loader in Jinja2 that loads templates from the file system. 
-It searches for templates in a specified directory on the file system and loads them when requested.
+## 🗺 Lab Architecture
 
+- Dual-hub DMVPN topology connecting multiple branch sites to HQ  
+- Each branch has its own Internet connection for redundancy  
+- IPsec secures the DMVPN tunnels end-to-end  
+- Centralized Windows server provides:
+  - DHCP
+  - DNS
+  - Network monitoring (PRTG)  
+
+
+
+---
+
+## Routing & DMVPN Design
+
+### EIGRP & Load-Sharing
+
+- EIGRP is used for internal reachability between HQ and branches  
+- **ECMP (Equal-Cost Multi-Path)** utilized to load-share traffic across both DMVPN tunnels  
+- Base NBMA/transport network configuration applied via CLI  
+- IPSLA with object tracking on **R1-LAN** ensures preferred default route to Internet via **R1-HUB**  
+
+---
+
+## IPsec & Security
+
+- All DMVPN tunnels are secured using **IPsec**  
+- Ensures confidentiality, integrity, and authentication across the WAN  
+- Compatible with dual-hub redundant design  
+
+---
+
+## IPSLA & Object Tracking
+
+- Configured on **R1-LAN** to monitor default route to Internet  
+- Ensures **R1-HUB** remains the preferred path  
+- Supports high availability for branch connectivity  
+
+---
+
+## Centralized Services
+
+- Each branch site maintains a local Internet connection  
+- Windows Server provides:
+  - DHCP and DNS for all branches  
+  - Network monitoring via **PRTG**  
+
+
+![Topology](/PRTG.png)
+---
+
+## 🖥 Lab Images & Platforms
+
+| Component | Image / Platform |
+|-----------|----------------|
+| Routers | `vios-adventerprisek9-m.vmdk.SPA.156-2.T` |
+| Linux VM | Ubuntu Desktop VM |
+| Windows Server | Windows Server 2016 QEMU VM |
+| PCs / Terminals | Webterm Docker containers |
+
+---
