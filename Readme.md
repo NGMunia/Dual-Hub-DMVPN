@@ -83,7 +83,7 @@ Designed to showcase real-world enterprise connectivity, resiliency, and automat
   - Network monitoring via **PRTG**  
 
 
-![Topology](/PRTG.png)
+![Topology](/PRTG.PNG)
 ---
 
 ## 🖥 Lab Images & Platforms
