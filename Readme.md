@@ -11,15 +11,28 @@ Designed to showcase real-world enterprise connectivity, resiliency, and automat
 ---
 ![Topology](/Topology.png)
 
+## Why DMVPN?
+
+Most enterprises deploy MPLS or IPsec site-to-site VPNs.  
+However, MPLS circuits can be expensive to deploy, especially for a full-mesh topology on multiple regional offices.  
+IPsec site-to-site VPNs, on the other hand, are not easily scalable when connecting multiple sites to the headquarters (HQ) or a data center.  
+
+Legacy IPsec VPNs are typically policy-based, meaning tinteresting raffic is matched against access control lists, which limits flexibility and scalability. In contrast, route-based VPNs using GRE tunnels allow routes to be advertised dynamically, enabling more efficient routing between sites.  
+
+DMVPN addresses these limitations with a hub-and-spoke architecture, allowing rapid deployment of spoke connections to the HQ or data center while also providing dynamic full-mesh connectivity between spokes at no additional cost (DMVPN Phase II).  
+Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure communications between sites.ites.
 
 
 ## Quick Overview
+This lab project demostrates dual-hub DMVPN design with the following:
 
-- **Routing:** EIGRP with ECMP for dual-hub traffic load-sharing  
+- **Routing:** EIGRP with ECMP for dual-hub traffic load-sharing 
+- **Redisribution** Hub routers redistribute OSPF and EIGRP routess to the mGRE tunnels and fortigate firewall respectively 
 - **Overlay Security:** IPsec-protected DMVPN tunnels  
 - **Automation:** Python-Netmiko
 - **Monitoring:** PRTG, SNMP, NetFlow  
-- **Services:** Centralized DHCP, DNS, NTP  
+- **Services:** Centralized DHCP, DNS, NTP 
+- **Additional security:** The Fortigate firewall allows for management and monitoring traffic to reach the server via firewall policies
 
 ---
 
@@ -27,23 +40,22 @@ Designed to showcase real-world enterprise connectivity, resiliency, and automat
 
 - Implement a dual-hub DMVPN architecture with branch redundancy  
 - Secure all tunnels using IPsec cryptography  
-- Automate repetitive configurations and device management  
-- Configure service resiliency using IPSLA and object tracking  
-- Deploy centralized network services for branches  
+- Automate repetitive configurations and device management   
+- Deploy centralized network services for branches (namely DHCP, Syslog, SNMP, Netflow) to the server.
 - Monitor traffic and device health with SNMP and PRTG  
 
 ---
 
-## 🗺 Lab Architecture
+## Lab Architecture
 
 - Dual-hub DMVPN topology connecting multiple branch sites to HQ  
-- Each branch has its own Internet connection for redundancy  
+- Each branch has its own Internet connection.  
+- Fortigate firewall sits behind the Hub routers to inspect incoming and outgoing traffic
 - IPsec secures the DMVPN tunnels end-to-end  
 - Centralized Windows server provides:
   - DHCP
-  - DNS
+  - SNMP, Syslog, Netflow
   - Network monitoring (PRTG)  
-
 
 
 ---
@@ -52,50 +64,151 @@ Designed to showcase real-world enterprise connectivity, resiliency, and automat
 
 ### EIGRP & Load-Sharing
 
+- mGRE tunnel is configured on the hub router as the transport network.
+- Spokes are configured with two tunnels one for R1 and the other for R2
 - EIGRP is used for internal reachability between HQ and branches  
 - **ECMP (Equal-Cost Multi-Path)** utilized to load-share traffic across both DMVPN tunnels  
-- Base NBMA/transport network configuration applied via CLI  
-- IPSLA with object tracking on **R1-LAN** ensures preferred default route to Internet via **R1-HUB**  
+  
 ```bash
 HUB-ROUTER:
 
-!
-interface Tunnel10
- description DMVPN-1-TUNNEL
- ip address 172.16.0.1 255.255.255.0
+interface Tunnel1
+ ip address 172.20.0.1 255.255.255.0
  no ip redirects
  ip mtu 1400
- no ip next-hop-self eigrp 100
- no ip split-horizon eigrp 100
- ip nhrp authentication dmvpn1
- ip nhrp map multicast dynamic
- ip nhrp network-id 10
- zone-member security Inside
+ ip nhrp authentication dmvpnvpn
+ ip nhrp network-id 20
  ip tcp adjust-mss 1360
- delay 1
- tunnel source GigabitEthernet0/1
+ tunnel source Ethernet0/3
  tunnel mode gre multipoint
- tunnel key 10
- tunnel protection ipsec profile crypto_profile
+ tunnel key 20
+ tunnel protection ipsec profile crypt-profile
+
+
  ```
  ```bash
  SPOKE-ROUTER:
- interface Tunnel10
- description DMVPN-1-TUNNEL
- ip address 172.16.0.2 255.255.255.0
+
+ interface Tunnel0
+ ip address 172.19.0.3 255.255.255.0
  no ip redirects
  ip mtu 1400
- ip nhrp authentication dmvpn1
+ ip nhrp authentication dmvpnvpn
  ip nhrp network-id 10
- ip nhrp nhs 172.16.0.1 nbma 32.19.86.2 multicast
- zone-member security Inside
+ ip nhrp holdtime 300
+ ip nhrp nhs 172.19.0.1 nbma 72.73.74.9 multicast
  ip tcp adjust-mss 1360
- delay 1
- tunnel source GigabitEthernet0/1
+ tunnel source Ethernet0/3
  tunnel mode gre multipoint
  tunnel key 10
- tunnel protection ipsec profile crypto_profile shared
+ tunnel protection ipsec profile crypt-profile shared
+!
+interface Tunnel1
+ ip address 172.20.0.3 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication dmvpnvpn
+ ip nhrp network-id 20
+ ip nhrp nhs 172.20.0.1 nbma 72.73.74.10 multicast
+ ip tcp adjust-mss 1360
+ tunnel source Ethernet0/3
+ tunnel mode gre multipoint
+ tunnel key 20
+ tunnel protection ipsec profile crypt-profile shared
+ 
  ```
+
+## EIGRP:
+EIGRP is used as the overlay routing protocol between the tunnel. 
+It is the protocol of choice dur its high convergence in GRE networks.
+
+```bash
+
+router eigrp EIGRP
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel0
+   bandwidth-percent 25
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
+  exit-af-topology
+  network 172.19.0.0 0.0.0.255
+ exit-address-family
+ ```
+
+## OSPF 
+ OSPF is used between the fortigate firewall and hub routers as it supports mult-vendor routing as opposed to EIGRP which is proprietary
+ 
+```bash
+On Fortigate Firewall:
+
+ 
+FortiGate-VM64-KVM # get router info ospf route 
+ 
+OSPF process 0:
+Codes: C - connected, D - Discard, O - OSPF, IA - OSPF inter area
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+ 
+E2 0.0.0.0/0 [1/1] via 10.0.0.6, port5
+                   via 10.0.0.2, port4
+C  10.0.0.0/30 [1] is directly connected, port4, Area 0.0.0.0
+C  10.0.0.4/30 [1] is directly connected, port5, Area 0.0.0.0
+C  10.1.20.0/24 [1] is directly connected, port2, Area 0.0.0.0
+E2 172.19.0.0/24 [1/20] via 10.0.0.2, port4
+E2 172.20.0.0/24 [1/20] via 10.0.0.6, port5
+E2 192.168.10.0/24 [1/20] via 10.0.0.6, port5
+                          via 10.0.0.2, port4
+E2 192.168.20.0/24 [1/20] via 10.0.0.6, port5
+                          via 10.0.0.2, port4
+E2 192.168.30.0/24 [1/20] via 10.0.0.6, port5
+                          via 10.0.0.2, port4
+ 
+ 
+FortiGate-VM64-KVM #  
+
+```
+# Route redistribution:
+OSPF and EIGRP routes are redistributed to DMVPN tunnel and Firewall respectively to achieve network reachability:
+
+```bash
+
+ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.19.0.0/24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 15 permit 192.168.20.0/24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/24
+!
+ip prefix-list OSPF-to-EIGRP-prefixes seq 5 permit 10.1.20.0/24
+ip prefix-list OSPF-to-EIGRP-prefixes seq 10 permit 10.1.30.0/24
+ipv6 ioam timestamp
+!
+route-map EIGRP-to-OSPF-routemap permit 10
+ match ip address prefix-list EIGRP-to-OSPF-prefixes
+!
+route-map OSPF-to-EIGRP-routemap permit 10
+ match ip address prefix-list OSPF-to-EIGRP-prefixes
+!
+!
+router eigrp EIGRP
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
+  
+!
+router ospf 1
+ router-id 2.2.2.2
+ auto-cost reference-bandwidth 100000
+ redistribute eigrp 100 subnets route-map EIGRP-to-OSPF-routemap
+ default-information originate
+!
+```
 
 
 ---
@@ -123,24 +236,6 @@ crypto ipsec profile crypto_profile
  set transform-set crypto_ts 
 !
 ```
----
-
-## IPSLA & Object Tracking
-
-- Configured on **R1-LAN** to monitor default route to Internet  
-- Ensures **R1-HUB** remains the preferred path  
-- Supports high availability for branch connectivity  
-
-```bash
-track 1 ip sla 1
- delay down 15 up 15
-!
-!
-ip sla 1
- icmp-echo 32.19.86.1 source-ip 10.1.30.1
- frequency 10
-ip sla schedule 1 life forever start-time now
-```
 
 ---
 
@@ -153,15 +248,4 @@ ip sla schedule 1 life forever start-time now
 
 
 ![Topology](/PRTG.PNG)
----
-
-## 🖥 Lab Images & Platforms
-
-| Component | Image / Platform |
-|-----------|----------------|
-| Routers | `vios-adventerprisek9-m.vmdk.SPA.156-2.T` |
-| Linux VM | Ubuntu Desktop VM |
-| Windows Server | Windows Server 2016 QEMU VM |
-| PCs / Terminals | Webterm Docker containers |
-
 ---
