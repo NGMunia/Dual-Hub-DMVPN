@@ -1,4 +1,4 @@
-# Dual-Hub / Cloud DMVPN Lab with IPsec
+# Dual-Hub DMVPN Lab with IPsec
 
 **A professional enterprise WAN lab demonstrating advanced DMVPN, IPsec security, EIGRP routing, automation, and network monitoring.**  
 Designed to showcase real-world enterprise connectivity, resiliency, and automation practices.
