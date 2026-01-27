@@ -12,7 +12,7 @@ while True:
         break
     else:
         print("incorrect username and/or password!!")
-        sername = input('Username: ')
+        Username = input('Username: ')
         password = getpass('password: ')
         enable_password = getpass('enable password: ')
 
