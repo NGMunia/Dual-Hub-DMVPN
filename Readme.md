@@ -20,7 +20,7 @@ IPsec site-to-site VPNs, on the other hand, are not easily scalable when connect
 Legacy IPsec VPNs are typically policy-based, meaning interesting traffic is matched against access control lists, which limits flexibility and scalability. In contrast, route-based VPNs using GRE tunnels (DMVPNs) allow routes to be advertised dynamically, enabling more efficient routing between sites.  
 
 DMVPN addresses these limitations with a hub-and-spoke architecture, allowing rapid deployment of spoke connections to the HQ or data center while also providing dynamic full-mesh connectivity between spokes at no additional cost (DMVPN Phase II).  
-Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure communications between sites.ites.
+Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure communications between HQ and branch sites and also traffic between branch sites is also secured
 
 
 ## Quick Overview
