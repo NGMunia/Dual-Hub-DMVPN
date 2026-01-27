@@ -1,7 +1,7 @@
 # Dual-Hub DMVPN Lab with IPsec
 
-**A professional enterprise WAN lab demonstrating advanced DMVPN, IPsec security, EIGRP routing, automation, and network monitoring.**  
-Designed to showcase real-world enterprise connectivity, resiliency, and automation practices.
+DMVPN (Dynamic Multipoint VPN) enables scalable site-to-multiple-site connectivity between a headquarters (HQ) and geographically distributed branch offices. It uses the Internet as the transport network and GRE tunnels as the overlay, allowing dynamic routing between sites. 
+When combined with IPsec, DMVPN provides secure, encrypted site-to-site communications.
 
 ![DMVPN](https://img.shields.io/badge/DMVPN-Phase2-blue)
 ![IPsec](https://img.shields.io/badge/IPsec-Secure-red)
