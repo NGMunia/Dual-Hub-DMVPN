@@ -17,7 +17,7 @@ Most enterprises deploy MPLS or IPsec site-to-site VPNs.
 However, MPLS circuits can be expensive to deploy, especially for a full-mesh topology on multiple regional offices.  
 IPsec site-to-site VPNs, on the other hand, are not easily scalable when connecting multiple sites to the headquarters (HQ) or a data center.  
 
-Legacy IPsec VPNs are typically policy-based, meaning tinteresting raffic is matched against access control lists, which limits flexibility and scalability. In contrast, route-based VPNs using GRE tunnels allow routes to be advertised dynamically, enabling more efficient routing between sites.  
+Legacy IPsec VPNs are typically policy-based, meaning interesting traffic is matched against access control lists, which limits flexibility and scalability. In contrast, route-based VPNs using GRE tunnels (DMVPNs) allow routes to be advertised dynamically, enabling more efficient routing between sites.  
 
 DMVPN addresses these limitations with a hub-and-spoke architecture, allowing rapid deployment of spoke connections to the HQ or data center while also providing dynamic full-mesh connectivity between spokes at no additional cost (DMVPN Phase II).  
 Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure communications between sites.ites.
