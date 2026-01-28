@@ -9,6 +9,7 @@ When combined with IPsec, DMVPN provides secure, encrypted site-to-site communic
 ![EIGRP](https://img.shields.io/badge/EIGRP-ECMP-orange)
 
 ---
+![Topology](/Topology.png)
 
 ## Why DMVPN?
 
@@ -57,7 +58,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
   - SNMP, Syslog, Netflow
   - Network monitoring (PRTG)  
 
-![Topology](/Topology.png)
+
 
 ---
 
