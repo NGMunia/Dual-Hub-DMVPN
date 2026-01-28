@@ -63,7 +63,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 ## Routing & DMVPN Design (Objective 1)
 
-### EIGRP & Load-Sharing
+### mGRE tunnels:
 
 - mGRE tunnel is configured on the hub router as the transport network.
 - Spokes are configured with two tunnels one for R1 and the other for R2
@@ -174,7 +174,7 @@ E2 192.168.30.0/24 [1/20] via 10.0.0.6, port5
 FortiGate-VM64-KVM #  
 
 ```
-# Route redistribution:
+## Route redistribution:
 OSPF and EIGRP routes are redistributed to DMVPN tunnel and Firewall respectively to achieve network reachability:
 
 ```bash
