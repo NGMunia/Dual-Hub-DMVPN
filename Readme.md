@@ -9,7 +9,6 @@ When combined with IPsec, DMVPN provides secure, encrypted site-to-site communic
 ![EIGRP](https://img.shields.io/badge/EIGRP-ECMP-orange)
 
 ---
-![Topology](/Topology.png)
 
 ## Why DMVPN?
 
@@ -58,6 +57,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
   - SNMP, Syslog, Netflow
   - Network monitoring (PRTG)  
 
+![Topology](/Topology.png)
 
 ---
 
@@ -119,7 +119,7 @@ interface Tunnel1
  
  ```
 
-## EIGRP:
+### EIGRP:
 EIGRP is used as the overlay routing protocol between the tunnel. 
 It is the protocol of choice dur its high convergence in GRE networks.
 
@@ -142,7 +142,7 @@ router eigrp EIGRP
  exit-address-family
  ```
 
-## OSPF 
+### OSPF 
  OSPF is used between the fortigate firewall and hub routers as it supports mult-vendor routing as opposed to EIGRP which is proprietary
  
 ```bash
@@ -174,7 +174,7 @@ E2 192.168.30.0/24 [1/20] via 10.0.0.6, port5
 FortiGate-VM64-KVM #  
 
 ```
-## Route redistribution:
+### Route redistribution:
 OSPF and EIGRP routes are redistributed to DMVPN tunnel and Firewall respectively to achieve network reachability:
 
 ```bash
