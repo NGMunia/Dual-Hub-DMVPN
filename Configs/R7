@@ -1,19 +1,19 @@
-Using 2845 out of 32768 bytes
+Using 3122 out of 32768 bytes
 !
-! Last configuration change at 10:37:55 UTC Tue Jan 27 2026
+! Last configuration change at 15:56:52 UTC Wed Jan 28 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R2-Branch
+hostname R7
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$KVL.$6d72rRZPzFbujLcBzaG9q1
+enable secret 5 $1$2fOU$nfBAtIkJAE7ZeKgjbI2.L1
 !
 aaa new-model
 !
@@ -69,7 +69,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$1olWdJmpjMcSdj$jcYY3kH3nFNdO.tuYgi7iFzchUQzlwztSGXwoLt7Wqk
+username Automation secret 8 $8$xMEvuvtB3C3W3T$wWTWSIB3MT5Jlcf3V0pLbGBrKVmlbXBLq9FYLOFKqNk
 !
 redundancy
 !
@@ -103,7 +103,7 @@ crypto ipsec profile crypt-profile
 !
 !
 interface Tunnel0
- ip address 172.19.0.3 255.255.255.0
+ ip address 172.19.0.4 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
@@ -117,7 +117,7 @@ interface Tunnel0
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Tunnel1
- ip address 172.20.0.3 255.255.255.0
+ ip address 172.20.0.4 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
@@ -130,7 +130,7 @@ interface Tunnel1
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Ethernet0/0
- ip address 192.168.20.1 255.255.255.0
+ ip address 192.168.30.1 255.255.255.0
  duplex auto
 !
 interface Ethernet0/1
@@ -157,10 +157,11 @@ router eigrp EIGRP
   exit-af-interface
   !
   topology base
+   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
   network 172.19.0.0 0.0.0.255
   network 172.20.0.0 0.0.0.255
-  network 192.168.20.0
+  network 192.168.30.0
   eigrp stub connected summary
  exit-address-family
 !
@@ -172,6 +173,10 @@ no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
 ip ssh version 2
 !
+!
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.10.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.20.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
 !
 !

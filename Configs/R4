@@ -1,19 +1,19 @@
-Using 3180 out of 32768 bytes
+Using 3060 out of 32768 bytes
 !
-! Last configuration change at 15:02:40 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 16:06:35 UTC Wed Jan 28 2026
 !
 version 15.7
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R2
+hostname R4
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$aFrt$uVHRryp/lOHGTzA1JUu4V.
+enable secret 5 $1$h7qN$I.bKKjdQJ5iDvEpy5rCaj/
 !
 aaa new-model
 !
@@ -69,7 +69,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$1vXNmXL9T/4F/z$B7RgXpLMhEr8HIkTG/fYhasAGCPOLnuw0y1sfoKViW.
+username Automation secret 8 $8$SujVI5R5nIN82D$7d6XvN87YPP4bYhJIyZbKfI6Ie/PHwA8RhsbwGeH4SI
 !
 redundancy
 !
@@ -102,21 +102,35 @@ crypto ipsec profile crypt-profile
 !
 !
 !
+interface Tunnel0
+ ip address 172.19.0.5 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication dmvpnvpn
+ ip nhrp network-id 10
+ ip nhrp holdtime 300
+ ip nhrp nhs 172.19.0.1 nbma 72.73.74.9 multicast
+ ip tcp adjust-mss 1360
+ tunnel source Ethernet0/3
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel protection ipsec profile crypt-profile shared
+!
 interface Tunnel1
- ip address 172.20.0.1 255.255.255.0
+ ip address 172.20.0.5 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
+ ip nhrp nhs 172.20.0.1 nbma 72.73.74.10 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
  tunnel key 20
- tunnel protection ipsec profile crypt-profile
+ tunnel protection ipsec profile crypt-profile shared
 !
 interface Ethernet0/0
- ip address 10.0.0.6 255.255.255.252
- ip ospf 1 area 0
+ ip address 192.168.11.1 255.255.255.0
  duplex auto
 !
 interface Ethernet0/1
@@ -130,7 +144,7 @@ interface Ethernet0/2
  duplex auto
 !
 interface Ethernet0/3
- ip address 72.73.74.10 255.255.255.0
+ ip address dhcp
  duplex auto
 !
 !
@@ -138,41 +152,31 @@ router eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
+  af-interface Tunnel0
+   bandwidth-percent 25
+  exit-af-interface
+  !
   topology base
-   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
+   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
+  network 172.19.0.0 0.0.0.255
   network 172.20.0.0 0.0.0.255
+  network 192.168.11.0
+  eigrp stub connected summary
  exit-address-family
-!
-router ospf 1
- router-id 3.3.3.3
- auto-cost reference-bandwidth 100000
- redistribute eigrp 100 subnets route-map EIGRP-to-OSPF-routemap
- default-information originate
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
 ip ssh version 2
 !
 !
-ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.20.0.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/23 ge 24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/23 ge 24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 30 permit 192.168.20.0/23 ge 24
-!
-ip prefix-list OSPF-to-EIGRP-prefixes seq 5 permit 10.1.20.0/24
-ip prefix-list OSPF-to-EIGRP-prefixes seq 10 permit 10.1.30.0/24
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.20.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.30.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
-!
-route-map EIGRP-to-OSPF-routemap permit 10
- match ip address prefix-list EIGRP-to-OSPF-prefixes
-!
-route-map OSPF-to-EIGRP-routemap permit 10
- match ip address prefix-list OSPF-to-EIGRP-prefixes
 !
 !
 !

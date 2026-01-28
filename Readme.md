@@ -39,6 +39,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 ## Project Objectives
 
 - Implement a dual-hub DMVPN architecture with branch redundancy  
+- Segregate the branch spokes in geographic regions and filter traffic so that regions receive HQ prefixes and prefixes within their regions.
 - Secure all tunnels using IPsec cryptography  
 - Automate repetitive configurations and device management   
 - Deploy centralized network services for branches (namely DHCP, Syslog, SNMP, Netflow) to the server.
@@ -60,7 +61,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 ---
 
-## Routing & DMVPN Design
+## Routing & DMVPN Design (Objective 1)
 
 ### EIGRP & Load-Sharing
 
@@ -209,11 +210,31 @@ router ospf 1
  default-information originate
 !
 ```
+## Route filtering (Objective 2)
+EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes egressing the router as shown.
+This is done in conjuction with prefix lists:
+The snippet below EIGRP filters 192.168.10.0/24, 192.168.11.0/24, 192.168.30.0/24 and 192.168.31.0/24 prefixes and allows all other prefixes to be added in the RIB
 
+```bash
+outer eigrp EIGRP
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+   distribute-list prefix EIGRP-filtered-prefixes in 
+  exit-af-topology
+ exit-address-family
+!
+i
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.10.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.30.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
+
+```
 
 ---
 
-## IPsec & Security
+## IPsec & Security (Objective 3)
 
 - All DMVPN tunnels are secured using **IPsec**  
 - Ensures confidentiality, integrity, and authentication across the WAN  
@@ -237,9 +258,50 @@ crypto ipsec profile crypto_profile
 !
 ```
 
----
+## Automationg the Network (Objective 4)
+Python uses netmiko libraries to automate network devices.
+Netmiko uses SSH as its southbound interface to login to devices and send confguration commands.
+Note: SSH must be enabled first for Netmiko to work.
 
-## Centralized Services
+Below is a snippet 
+
+```python
+for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), Region_C.values()):
+    c = ConnectHandler(**Devices)
+    c.enable()
+
+    hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
+    output = c.send_command('show startup-config')
+    print(output)
+
+```
+The above pyton script fetches the start-up configurations of all devices and prints them as output.
+
+## Network Assurance (Objective 5)
+SNMP can be configured to send unsolicited traps to notify an NMS of important events such as interface up/down, device reboots, or threshold-based alerts (e.g. high CPU usage).
+
+An NMS (Network Management System) receives these traps and may also poll devices via SNMP to collect performance metrics like CPU and interface utilization, presenting the data in human-readable dashboards and graphs.
+
+Examples of NMS platforms include PRTG and SolarWinds.
+Below is a snippet of SNMP configuration
+
+```python
+
+for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), Region_C.values()):
+    c = ConnectHandler(**Devices)
+    c.enable()
+
+    commands = [
+                'ip access-list standard snmp_acl',
+                'permit host 10.1.30.254',
+                'snmp-server community device_snmp snmp_acl',
+                'snmp-server system-shutdown',
+                'snmp-server enable traps config',
+                'snmp-server host 10.1.30.254 version 2c device_snmp']
+    print(c.send_config_set(commands))
+```
+
+## Centralized Services (Objective 6)
 
 - Each branch site maintains a local Internet connection  
 - Windows Server provides:

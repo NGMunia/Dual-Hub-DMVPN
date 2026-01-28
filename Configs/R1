@@ -1,6 +1,6 @@
-Using 3590 out of 32768 bytes
+Using 3622 out of 32768 bytes
 !
-! Last configuration change at 10:20:20 UTC Tue Jan 27 2026
+! Last configuration change at 15:01:41 UTC Wed Jan 28 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -178,9 +178,9 @@ ip access-list extended nat-acl
 !
 !
 ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.19.0.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 15 permit 192.168.20.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/23 ge 24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/23 ge 24
+ip prefix-list EIGRP-to-OSPF-prefixes seq 30 permit 192.168.20.0/23 ge 24
 !
 ip prefix-list OSPF-to-EIGRP-prefixes seq 5 permit 10.1.20.0/24
 ip prefix-list OSPF-to-EIGRP-prefixes seq 10 permit 10.1.30.0/24
