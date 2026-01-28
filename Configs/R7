@@ -1,6 +1,6 @@
-Using 3122 out of 32768 bytes
+Using 3336 out of 32768 bytes
 !
-! Last configuration change at 15:56:52 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 17:59:26 UTC Wed Jan 28 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -173,12 +173,19 @@ no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
 ip ssh version 2
 !
+ip access-list standard snmp_acl
+ permit 10.1.30.254
+!
 !
 ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.10.0/23 ge 24
 ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.20.0/23 ge 24
 ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
 !
+snmp-server community device_snmp RO snmp_acl
+snmp-server system-shutdown
+snmp-server enable traps config
+snmp-server host 10.1.30.254 version 2c device_snmp 
 !
 !
 !

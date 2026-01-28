@@ -1,6 +1,6 @@
-Using 3180 out of 32768 bytes
+Using 3394 out of 32768 bytes
 !
-! Last configuration change at 15:02:40 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 17:59:05 UTC Wed Jan 28 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -158,6 +158,9 @@ no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
 ip ssh version 2
 !
+ip access-list standard snmp_acl
+ permit 10.1.30.254
+!
 !
 ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.20.0.0/24
 ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/23 ge 24
@@ -174,6 +177,10 @@ route-map EIGRP-to-OSPF-routemap permit 10
 route-map OSPF-to-EIGRP-routemap permit 10
  match ip address prefix-list OSPF-to-EIGRP-prefixes
 !
+snmp-server community device_snmp RO snmp_acl
+snmp-server system-shutdown
+snmp-server enable traps config
+snmp-server host 10.1.30.254 version 2c device_snmp 
 !
 !
 !
