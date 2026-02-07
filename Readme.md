@@ -32,7 +32,6 @@ This lab project demostrates dual-hub DMVPN design with the following:
 - **Automation:** Python-Netmiko
 - **Monitoring:** PRTG, SNMP, NetFlow  
 - **Services:** Centralized DHCP, DNS, NTP 
-- **Additional security:** The Fortigate firewall allows for management and monitoring traffic to reach the server via firewall policies
 
 ---
 
@@ -130,87 +129,25 @@ router eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
-  af-interface Tunnel0
+  af-interface Tunnel1
    bandwidth-percent 25
    no next-hop-self
    no split-horizon
   exit-af-interface
   !
+  af-interface Ethernet0/0
+   passive-interface
+  exit-af-interface
+  !
   topology base
-   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
   exit-af-topology
-  network 172.19.0.0 0.0.0.255
+  network 172.16.255.0 0.0.0.255
+  network 192.168.1.0
+ exit-address-family
  exit-address-family
  ```
 
-### OSPF 
- OSPF is used between the fortigate firewall and hub routers as it supports mult-vendor routing as opposed to EIGRP which is proprietary
- 
-```bash
-On Fortigate Firewall:
 
- 
-FortiGate-VM64-KVM # get router info ospf route 
- 
-OSPF process 0:
-Codes: C - connected, D - Discard, O - OSPF, IA - OSPF inter area
-       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
-       E1 - OSPF external type 1, E2 - OSPF external type 2
- 
-E2 0.0.0.0/0 [1/1] via 10.0.0.6, port5
-                   via 10.0.0.2, port4
-C  10.0.0.0/30 [1] is directly connected, port4, Area 0.0.0.0
-C  10.0.0.4/30 [1] is directly connected, port5, Area 0.0.0.0
-C  10.1.20.0/24 [1] is directly connected, port2, Area 0.0.0.0
-E2 172.19.0.0/24 [1/20] via 10.0.0.2, port4
-E2 172.20.0.0/24 [1/20] via 10.0.0.6, port5
-E2 192.168.10.0/24 [1/20] via 10.0.0.6, port5
-                          via 10.0.0.2, port4
-E2 192.168.20.0/24 [1/20] via 10.0.0.6, port5
-                          via 10.0.0.2, port4
-E2 192.168.30.0/24 [1/20] via 10.0.0.6, port5
-                          via 10.0.0.2, port4
- 
- 
-FortiGate-VM64-KVM #  
-
-```
-### Route redistribution:
-OSPF and EIGRP routes are redistributed to DMVPN tunnel and Firewall respectively to achieve network reachability:
-
-```bash
-
-ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.19.0.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 15 permit 192.168.20.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/24
-!
-ip prefix-list OSPF-to-EIGRP-prefixes seq 5 permit 10.1.20.0/24
-ip prefix-list OSPF-to-EIGRP-prefixes seq 10 permit 10.1.30.0/24
-ipv6 ioam timestamp
-!
-route-map EIGRP-to-OSPF-routemap permit 10
- match ip address prefix-list EIGRP-to-OSPF-prefixes
-!
-route-map OSPF-to-EIGRP-routemap permit 10
- match ip address prefix-list OSPF-to-EIGRP-prefixes
-!
-!
-router eigrp EIGRP
- !
- address-family ipv4 unicast autonomous-system 100
-  !
-  topology base
-   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
-  
-!
-router ospf 1
- router-id 2.2.2.2
- auto-cost reference-bandwidth 100000
- redistribute eigrp 100 subnets route-map EIGRP-to-OSPF-routemap
- default-information originate
-!
-```
 ## Route filtering (Objective 2)
 EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes egressing the router as shown.
 This is done in conjuction with prefix lists:
@@ -221,14 +158,21 @@ outer eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
+  af-interface default
+   bandwidth-percent 25
+  exit-af-interface
+  !
   topology base
    distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
+  network 172.16.1.0 0.0.0.255
+  network 192.168.0.0
+  network 192.168.1.0
  exit-address-family
 !
-i
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.10.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.30.0/23 ge 24
+!
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.2.0/23 le 32
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 le 32
 ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 
 ```
@@ -243,18 +187,20 @@ ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 
 ```bash
 crypto isakmp policy 100
- encr aes 256
+ encr aes 192
  hash sha256
  authentication pre-share
  group 14
  lifetime 7200
-crypto isakmp key strongkey address 0.0.0.0        
+crypto isakmp key usestrongkey! address 0.0.0.0        
 !
 !
-crypto ipsec transform-set crypto_ts esp-aes 256 esp-sha256-hmac 
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
  mode transport
 !
-crypto ipsec profile crypto_profile
+crypto ipsec profile crypt-profile
+ set transform-set crypt-ts 
+!
  set transform-set crypto_ts 
 !
 ```
@@ -277,6 +223,23 @@ for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), 
 
 ```
 The above pyton script fetches the start-up configurations of all devices and prints them as output.
+
+### Verifying EIGRP routes:
+
+```python
+for devices in chain(
+                     HQ_routers.values(),
+                     Region_A.values(), 
+                     Region_B.values(), 
+                     Region_C.values()
+                     ):
+  c = ConnectHandler(**devices)
+  c.enable()
+  hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
+  
+  output = c.send_command('show ip route eigrp','\n')
+  print(f'\n\n{hostname}\n,{output}')
+```
 
 ## Network Assurance (Objective 5)
 SNMP can be configured to send unsolicited traps to notify an NMS of important events such as interface up/down, device reboots, or threshold-based alerts (e.g. high CPU usage).

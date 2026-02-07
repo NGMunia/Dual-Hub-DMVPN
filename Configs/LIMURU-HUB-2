@@ -1,19 +1,19 @@
-Using 3336 out of 32768 bytes
+Using 3437 out of 32768 bytes
 !
-! Last configuration change at 17:59:09 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 09:05:26 UTC Sat Feb 7 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R3
+hostname LIMURU-HUB-2
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$CGHr$9dO7LJmEbp1Rui5Hi.TJQ1
+enable secret 5 $1$YiW9$IqDt4.AFFxO3z26uUQAPv1
 !
 aaa new-model
 !
@@ -37,6 +37,7 @@ mmi snmp-timeout 180
 !
 !
 !
+fhrp version vrrp v3
 no ip icmp rate-limit unreachable
 !
 !
@@ -69,7 +70,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$0kL//apR0IPmWj$XlHpLJe7VUPKr/TJ/x1wJUf9bT1b9MARj/cO8ukU2Lk
+username Automation secret 8 $8$nUhEURlXjkZQ7j$lA8d7NhUF9P5m8II10wPx.CjLozpecyB.jVCEbrSSY.
 !
 redundancy
 !
@@ -90,7 +91,7 @@ crypto isakmp policy 100
 crypto isakmp key usestrongkey! address 0.0.0.0        
 !
 !
-crypto ipsec transform-set crypt-ts esp-aes 192 esp-sha256-hmac 
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
  mode transport
 !
 crypto ipsec profile crypt-profile
@@ -102,36 +103,27 @@ crypto ipsec profile crypt-profile
 !
 !
 !
-interface Tunnel0
- ip address 172.19.0.2 255.255.255.0
- no ip redirects
- ip mtu 1400
- ip nhrp authentication dmvpnvpn
- ip nhrp network-id 10
- ip nhrp holdtime 300
- ip nhrp nhs 172.19.0.1 nbma 72.73.74.9 multicast
- ip tcp adjust-mss 1360
- tunnel source Ethernet0/3
- tunnel mode gre multipoint
- tunnel key 10
- tunnel protection ipsec profile crypt-profile shared
-!
 interface Tunnel1
- ip address 172.20.0.2 255.255.255.0
+ ip address 192.168.1.1 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
- ip nhrp nhs 172.20.0.1 nbma 72.73.74.10 multicast
+ ip nhrp holdtime 300
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
  tunnel key 20
- tunnel protection ipsec profile crypt-profile shared
+ tunnel protection ipsec profile crypt-profile
 !
 interface Ethernet0/0
- ip address 192.168.10.1 255.255.255.0
+ ip address 172.16.255.2 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
  duplex auto
+ vrrp 10 address-family ipv4
+  address 172.16.255.3 primary
+  exit-vrrp
 !
 interface Ethernet0/1
  no ip address
@@ -144,7 +136,9 @@ interface Ethernet0/2
  duplex auto
 !
 interface Ethernet0/3
- ip address dhcp
+ ip address 32.19.86.10 255.255.255.0
+ ip nat outside
+ ip virtual-reassembly in
  duplex auto
 !
 !
@@ -152,17 +146,20 @@ router eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
-  af-interface Tunnel0
+  af-interface Tunnel1
    bandwidth-percent 25
+   no next-hop-self
+   no split-horizon
+  exit-af-interface
+  !
+  af-interface Ethernet0/0
+   passive-interface
   exit-af-interface
   !
   topology base
-   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
-  network 172.19.0.0 0.0.0.255
-  network 172.20.0.0 0.0.0.255
-  network 192.168.10.0
-  eigrp stub connected summary
+  network 172.16.255.0 0.0.0.255
+  network 192.168.1.0
  exit-address-family
 !
 ip forward-protocol nd
@@ -170,22 +167,26 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
-ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
+ip nat inside source list nat-acl interface Ethernet0/3 overload
+ip route 0.0.0.0 0.0.0.0 Ethernet0/3 32.19.86.1
 ip ssh version 2
 !
 ip access-list standard snmp_acl
- permit 10.1.30.254
+ permit 172.16.255.254
 !
+ip access-list extended nat-acl
+ permit ip 172.16.255.0 0.0.0.255 any
 !
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.20.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.30.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
+ip sla 1
+ icmp-echo 32.19.86.1 source-interface Ethernet0/3
+ frequency 10
+ip sla schedule 1 life forever start-time now
 ipv6 ioam timestamp
 !
 snmp-server community device_snmp RO snmp_acl
 snmp-server system-shutdown
 snmp-server enable traps config
-snmp-server host 10.1.30.254 version 2c device_snmp 
+snmp-server host 172.16.255.254 version 2c device_snmp 
 !
 !
 !
@@ -198,6 +199,14 @@ control-plane
 !
 !
 !
+banner login ^C
+##################################################
+#  LIMURU-HUB-2
+#  ROYAL MEDIA SERVICES LIMITED
+#  BROADCAST TRANSMISSION DEPARTMENT
+#  Unauthorized access is strictly forbidden
+##################################################
+^C
 !
 line con 0
  exec-timeout 0 0

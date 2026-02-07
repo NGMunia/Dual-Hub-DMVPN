@@ -1,0 +1,15 @@
+
+crypto isakmp policy {{IKE_policy_number}}
+encr aes 192
+hash sha256
+authentication pre-share
+group 14
+lifetime 7200
+
+crypto isakmp key usestrongkey! address 0.0.0.0  
+
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
+ mode transport
+
+crypto ipsec profile crypt-profile
+ set transform-set crypt-ts 

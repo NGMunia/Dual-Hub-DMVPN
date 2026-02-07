@@ -1,19 +1,19 @@
-Using 3394 out of 32768 bytes
+Using 3569 out of 32768 bytes
 !
-! Last configuration change at 17:59:05 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 08:47:15 UTC Sat Feb 7 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R2
+hostname MALINDI-TX-STATION
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$aFrt$uVHRryp/lOHGTzA1JUu4V.
+enable secret 5 $1$ageV$Dx0BGyl4XeozENDpPGph50
 !
 aaa new-model
 !
@@ -69,7 +69,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$1vXNmXL9T/4F/z$B7RgXpLMhEr8HIkTG/fYhasAGCPOLnuw0y1sfoKViW.
+username Automation secret 8 $8$OzrfS2X8dMMF8j$gSB7I8yrWkVNutICI65Da.arx/lOiAEOQTI5JYWd5ps
 !
 redundancy
 !
@@ -90,7 +90,7 @@ crypto isakmp policy 100
 crypto isakmp key usestrongkey! address 0.0.0.0        
 !
 !
-crypto ipsec transform-set crypt-ts esp-aes 192 esp-sha256-hmac 
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
  mode transport
 !
 crypto ipsec profile crypt-profile
@@ -102,21 +102,35 @@ crypto ipsec profile crypt-profile
 !
 !
 !
+interface Tunnel0
+ ip address 192.168.0.3 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication dmvpnvpn
+ ip nhrp network-id 10
+ ip nhrp holdtime 300
+ ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
+ ip tcp adjust-mss 1360
+ tunnel source Ethernet0/3
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel protection ipsec profile crypt-profile shared
+!
 interface Tunnel1
- ip address 172.20.0.1 255.255.255.0
+ ip address 192.168.1.3 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
+ ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
  tunnel key 20
- tunnel protection ipsec profile crypt-profile
+ tunnel protection ipsec profile crypt-profile shared
 !
 interface Ethernet0/0
- ip address 10.0.0.6 255.255.255.252
- ip ospf 1 area 0
+ ip address 172.16.1.1 255.255.255.0
  duplex auto
 !
 interface Ethernet0/1
@@ -130,7 +144,7 @@ interface Ethernet0/2
  duplex auto
 !
 interface Ethernet0/3
- ip address 72.73.74.10 255.255.255.0
+ ip address dhcp
  duplex auto
 !
 !
@@ -138,49 +152,39 @@ router eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
+  af-interface default
+   bandwidth-percent 25
+  exit-af-interface
+  !
   topology base
-   redistribute ospf 1 metric 100000 1 255 1 1500 route-map OSPF-to-EIGRP-routemap
+   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
-  network 172.20.0.0 0.0.0.255
+  network 172.16.1.0 0.0.0.255
+  network 192.168.0.0
+  network 192.168.1.0
  exit-address-family
-!
-router ospf 1
- router-id 3.3.3.3
- auto-cost reference-bandwidth 100000
- redistribute eigrp 100 subnets route-map EIGRP-to-OSPF-routemap
- default-information originate
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-ip route 0.0.0.0 0.0.0.0 Ethernet0/3 72.73.74.1
+ip route 0.0.0.0 0.0.0.0 Ethernet0/3 32.19.86.1
 ip ssh version 2
 !
 ip access-list standard snmp_acl
- permit 10.1.30.254
+ permit 172.16.255.254
 !
 !
-ip prefix-list EIGRP-to-OSPF-prefixes seq 5 permit 172.20.0.0/24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 10 permit 192.168.10.0/23 ge 24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 20 permit 192.168.30.0/23 ge 24
-ip prefix-list EIGRP-to-OSPF-prefixes seq 30 permit 192.168.20.0/23 ge 24
-!
-ip prefix-list OSPF-to-EIGRP-prefixes seq 5 permit 10.1.20.0/24
-ip prefix-list OSPF-to-EIGRP-prefixes seq 10 permit 10.1.30.0/24
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.2.0/23 le 32
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 le 32
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
-!
-route-map EIGRP-to-OSPF-routemap permit 10
- match ip address prefix-list EIGRP-to-OSPF-prefixes
-!
-route-map OSPF-to-EIGRP-routemap permit 10
- match ip address prefix-list OSPF-to-EIGRP-prefixes
 !
 snmp-server community device_snmp RO snmp_acl
 snmp-server system-shutdown
 snmp-server enable traps config
-snmp-server host 10.1.30.254 version 2c device_snmp 
+snmp-server host 172.16.255.254 version 2c device_snmp 
 !
 !
 !
@@ -193,6 +197,14 @@ control-plane
 !
 !
 !
+banner login ^C
+##################################################
+#  MALINDI-TX-STATION
+#  ROYAL MEDIA SERVICES LIMITED
+#  BROADCAST TRANSMISSION DEPARTMENT
+#  Unauthorized access is strictly forbidden
+##################################################
+^C
 !
 line con 0
  exec-timeout 0 0

@@ -1,19 +1,19 @@
-Using 3288 out of 32768 bytes
+Using 3303 out of 32768 bytes
 !
-! Last configuration change at 17:59:13 UTC Wed Jan 28 2026 by Automation
+! Last configuration change at 08:02:21 UTC Sat Feb 7 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R4
+hostname LONDIANI-TX-STATION
 !
 boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$h7qN$I.bKKjdQJ5iDvEpy5rCaj/
+enable secret 5 $1$VW4w$zCdJgAB0EyL1zD9hVxm8C/
 !
 aaa new-model
 !
@@ -69,7 +69,7 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$SujVI5R5nIN82D$7d6XvN87YPP4bYhJIyZbKfI6Ie/PHwA8RhsbwGeH4SI
+username Automation secret 8 $8$//bcBwzVSgviaz$67.PdOna.3vhTdXsZ.PvQehC76vMENIWmdiBIiG6MEw
 !
 redundancy
 !
@@ -90,7 +90,7 @@ crypto isakmp policy 100
 crypto isakmp key usestrongkey! address 0.0.0.0        
 !
 !
-crypto ipsec transform-set crypt-ts esp-aes 192 esp-sha256-hmac 
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
  mode transport
 !
 crypto ipsec profile crypt-profile
@@ -103,13 +103,13 @@ crypto ipsec profile crypt-profile
 !
 !
 interface Tunnel0
- ip address 172.19.0.5 255.255.255.0
+ ip address 192.168.0.5 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 10
  ip nhrp holdtime 300
- ip nhrp nhs 172.19.0.1 nbma 72.73.74.9 multicast
+ ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -117,12 +117,12 @@ interface Tunnel0
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Tunnel1
- ip address 172.20.0.5 255.255.255.0
+ ip address 192.168.1.5 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
- ip nhrp nhs 172.20.0.1 nbma 72.73.74.10 multicast
+ ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -130,7 +130,7 @@ interface Tunnel1
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Ethernet0/0
- ip address 192.168.11.1 255.255.255.0
+ ip address 172.16.3.1 255.255.255.0
  duplex auto
 !
 interface Ethernet0/1
@@ -152,17 +152,15 @@ router eigrp EIGRP
  !
  address-family ipv4 unicast autonomous-system 100
   !
-  af-interface Tunnel0
+  af-interface default
    bandwidth-percent 25
   exit-af-interface
   !
   topology base
-   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
-  network 172.19.0.0 0.0.0.255
-  network 172.20.0.0 0.0.0.255
-  network 192.168.11.0
-  eigrp stub connected summary
+  network 172.16.3.0 0.0.0.3
+  network 192.168.0.0
+  network 192.168.1.0
  exit-address-family
 !
 ip forward-protocol nd
@@ -170,21 +168,18 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 Ethernet0/3 32.19.86.1
 ip ssh version 2
 !
 ip access-list standard snmp_acl
- permit 10.1.30.254
+ permit 172.16.255.254
 !
-!
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 192.168.20.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 192.168.30.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
 !
 snmp-server community device_snmp RO snmp_acl
 snmp-server system-shutdown
 snmp-server enable traps config
-snmp-server host 10.1.30.254 version 2c device_snmp 
+snmp-server host 172.16.255.254 version 2c device_snmp 
 !
 !
 !
@@ -197,6 +192,14 @@ control-plane
 !
 !
 !
+banner login ^C
+##################################################
+#  LONDIANI-TX-STATION
+#  ROYAL MEDIA SERVICES LIMITED
+#  BROADCAST TRANSMISSION DEPARTMENT
+#  Unauthorized access is strictly forbidden
+##################################################
+^C
 !
 line con 0
  exec-timeout 0 0
