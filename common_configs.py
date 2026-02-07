@@ -32,7 +32,7 @@ for devices in chain(
 
 
 
-## CONFIGURING MOTD BANNER:
+# CONFIGURING MOTD BANNER:
 # - This is the welcome banner you see when you login remotely on the device:
 print('CONFIGURING MOTD BANNER')
 for devices in chain(
@@ -63,7 +63,7 @@ for devices in chain(
 
 
 
-## CONFIGURING CRYPTO-ALGORITHMS:
+# CONFIGURING CRYPTO-ALGORITHMS:
 #  These are the parameters that will be used for IKE phase 1 and IKE phase 2 Negotiations;
 jinja_templates = input('Input directory path:')  
 IKE_policy_number = input('Input IKE policy number: ')
@@ -89,7 +89,7 @@ for devices in chain(
 
   
 
-  ## CONFIGURE LAN IPs
+## CONFIGURE LAN IPs
 for devices in chain(
                      Region_A.values(), 
                      Region_B.values(), 
