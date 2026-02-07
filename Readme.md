@@ -73,16 +73,17 @@ This lab project demostrates dual-hub DMVPN design with the following:
 ```bash
 HUB-ROUTER:
 
-interface Tunnel1
- ip address 172.20.0.1 255.255.255.0
+interface Tunnel0
+ ip address 192.168.0.1 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
- ip nhrp network-id 20
+ ip nhrp network-id 10
+ ip nhrp holdtime 300
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
- tunnel key 20
+ tunnel key 10
  tunnel protection ipsec profile crypt-profile
 
 
@@ -91,13 +92,13 @@ interface Tunnel1
  SPOKE-ROUTER:
 
  interface Tunnel0
- ip address 172.19.0.3 255.255.255.0
+ ip address 192.168.0.6 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 10
  ip nhrp holdtime 300
- ip nhrp nhs 172.19.0.1 nbma 72.73.74.9 multicast
+ ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -105,12 +106,12 @@ interface Tunnel1
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Tunnel1
- ip address 172.20.0.3 255.255.255.0
+ ip address 192.168.1.6 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
- ip nhrp nhs 172.20.0.1 nbma 72.73.74.10 multicast
+ ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -151,7 +152,7 @@ router eigrp EIGRP
 ## Route filtering (Objective 2)
 EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes egressing the router as shown.
 This is done in conjuction with prefix lists:
-The snippet below EIGRP filters 192.168.10.0/24, 192.168.11.0/24, 192.168.30.0/24 and 192.168.31.0/24 prefixes and allows all other prefixes to be added in the RIB
+The snippet below EIGRP filters 192.168.10.0/24, 172.16.2.0/24, 172.16.3.0/24, 172.16.4.0/24 and 172.16.5.0/24 prefixes and allows all other prefixes to be added in the RIB
 
 ```bash
 outer eigrp EIGRP
