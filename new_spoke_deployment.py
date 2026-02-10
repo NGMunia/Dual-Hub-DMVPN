@@ -58,10 +58,10 @@ ip = input(f'Input the LAN IP address and subnet mask whose gateway is {hostname
 intf = input('LAN interface: ')
 
 intf_commands = [
-            f'interface {intf}',
-            f'ip address {ip}',
-            'no shut'
-           ]
+                 f'interface {intf}',
+                 f'ip address {ip}',
+                 'no shut'
+                ]
      
 print(c.send_config_set(intf_commands),'\n')
 
@@ -90,15 +90,15 @@ print(c.send_config_set(eigrp_commands),'\n')
 # - This is the welcome banner you see when you login remotely on the device:
 print('CONFIGURING MOTD BANNER')
 banner_commands = [
-             'banner login @',
-             f'{"#"*50}',
-             f'{"#  "}{hostname}',
-             f'{"#  "}ROYAL MEDIA SERVICES LIMITED',
-             f'{"#  "}BROADCAST TRANSMISSION DEPARTMENT',
-             f'{"#  "}Unauthorized access is strictly forbidden',
-             f'{"#"*50}',
-             '@'
-           ]
+                    'banner login @',
+                   f'{"#"*50}',
+                   f'{"#  "}{hostname}',
+                   f'{"#  "}ROYAL MEDIA SERVICES LIMITED',
+                   f'{"#  "}BROADCAST TRANSMISSION DEPARTMENT',
+                   f'{"#  "}Unauthorized access is strictly forbidden',
+                   f'{"#"*50}',
+                  '@'
+                 ]
 print(c.send_config_set(banner_commands),'\n')
 
 
@@ -106,7 +106,7 @@ print(c.send_config_set(banner_commands),'\n')
 IKE_policy_number = input('Input IKE policy number: ')
 crypto_data = {
                 'IKE_policy_number': IKE_policy_number
-               } 
+              } 
 env = Environment(loader=FileSystemLoader(jinja_templates))
 template = env.get_template("crypto.j2")
   
