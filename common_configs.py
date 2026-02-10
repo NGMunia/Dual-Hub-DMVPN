@@ -99,7 +99,7 @@ for devices in chain(
      c.enable()
      hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
 
-     ip = input(f'Input the LAN Gateway IP address and subnet mask of {hostname}: ')
+     ip = input(f'Input the LAN IP address and subnet mask whose gateway is {hostname}: ')
      intf = input('LAN interface: ')
 
      commands = [f'interface {intf}',
@@ -122,7 +122,7 @@ for devices in chain(
      c.enable()
      hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
 
-     network = input(f'Input the LAN network and wildcard mask of {hostname}: ')
+     network = input(f'Input the LAN network and wildcard mask attached to {hostname} you wish to advertise: ')
 
      commands = ['router eigrp EIGRP',
                  'address-family ipv4 autonomous-system 100',
