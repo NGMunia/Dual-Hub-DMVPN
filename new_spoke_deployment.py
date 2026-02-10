@@ -72,11 +72,13 @@ print(c.send_config_set(intf_commands),'\n')
 
 print('-----CONFIGURING EIGRP----')                    
 lan_network = input(f'Input the LAN network and wildcard mask attached to {hostname} you wish to advertise: ')
-tunnel0_network = input(f'Input the Tunnel0 network and subnet mask attached to {hostname}: ')
-tunnel1_network = input(f'Input the Tunnel0 network and subnet mask attached to {hostname}: ')
+tunnel0_network = input(f'Input the Tunnel0 network and wildcard mask attached to {hostname}: ')
+tunnel1_network = input(f'Input the Tunnel0 network and wildcard mask attached to {hostname}: ')
 eigrp_commands = [
-                  'router eigrp EIGRP',
-                  'address-family ipv4 autonomous-system 100',
+                   'router eigrp EIGRP',
+                   'address-family ipv4 autonomous-system 100',
+                   'af- interface default',
+                   'bandwidth-percent 25',
                   f'network {lan_network}',
                   f'network {tunnel0_network}',
                   f'network {tunnel1_network}'
