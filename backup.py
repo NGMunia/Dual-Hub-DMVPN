@@ -1,3 +1,8 @@
+
+
+# The following scripts are used to back up configurations and fetch critical device health and document them for
+# reference.
+
 from Device_list.Devices import HQ_routers, Region_A, Region_B, Region_C
 from netmiko import ConnectHandler
 from itertools import chain
@@ -6,6 +11,11 @@ from csv import writer
 
 
 # DEVICE INVETORY
+# - This script will parse all network devices and collect critical information such as: 
+#     - Software information
+#     - Software version
+#     - Serial numbers
+#     - Hardware models
 
 filepath = input('input the folder path where device inventory will be stored: ')
 with open(f'{filepath}/Data.csv','w') as f:
@@ -36,6 +46,8 @@ with open(f'{filepath}/Data.csv','w') as f:
 
 
 ## STORING START-UP CONFIGURATIONS:
+# - This cript will parse through all network devices, collect and store their start-up configurations
+
 backup_filepath = input('Input the folder path where all startup configurations will be stored: ')
 for Devices in chain(
                      HQ_routers.values(), 

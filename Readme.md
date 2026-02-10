@@ -206,7 +206,7 @@ crypto ipsec profile crypt-profile
 !
 ```
 
-## Automationg the Network (Objective 4)
+## Automating the Network (Objective 4)
 Python uses netmiko libraries to automate network devices.
 Netmiko uses SSH as its southbound interface to login to devices and send confguration commands.
 Note: SSH must be enabled first for Netmiko to work.
