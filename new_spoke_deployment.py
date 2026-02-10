@@ -77,7 +77,7 @@ tunnel1_network = input(f'Input the Tunnel0 network and wildcard mask attached t
 eigrp_commands = [
                    'router eigrp EIGRP',
                    'address-family ipv4 autonomous-system 100',
-                   'af- interface default',
+                   'af-interface default',
                    'bandwidth-percent 25',
                   f'network {lan_network}',
                   f'network {tunnel0_network}',
