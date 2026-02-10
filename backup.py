@@ -17,12 +17,9 @@ from csv import writer
 #     - Serial numbers
 #     - Hardware models
 #  Automated Network Inventory Engine
-
 #  Function: Programmatically audits multi-region network infrastructure to collect critical asset data (Software image, version, serial numbers, 
 #  and hardware models).
-
 #  Workflow: Leverages Netmiko for SSH connectivity and TextFSM to parse unstructured CLI data into structured Python dictionaries.
-
 #  Output: Generates a centralized CSV inventory report.
 
 
