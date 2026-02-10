@@ -13,3 +13,6 @@ crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac
 
 crypto ipsec profile crypt-profile
  set transform-set crypt-ts 
+
+int range tun0, tun1
+tunnel protection ipsec profile crypt-profile shared

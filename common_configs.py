@@ -32,64 +32,6 @@ for devices in chain(
 
 
 
-# CONFIGURING MOTD BANNER:
-# - This is the welcome banner you see when you login remotely on the device:
-print('CONFIGURING MOTD BANNER')
-for devices in chain(
-                     HQ_routers.values(),
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()
-                     ):
-    
-    c = ConnectHandler(**devices)
-    c.enable()
-    host = c.send_command('show version',use_textfsm=True)[0]['hostname']
-    banner_hostname = input (f'Enter the new hostname of {host}: ')
-
-    commands = [
-                'banner login @',
-               f'{"#"*50}',
-               f'{"#  "}{banner_hostname}',
-               f'{"#  "}ROYAL MEDIA SERVICES LIMITED',
-               f'{"#  "}BROADCAST TRANSMISSION DEPARTMENT',
-               f'{"#  "}Unauthorized access is strictly forbidden',
-               f'{"#"*50}',
-               '@']
-    print(c.send_config_set(commands),'\n')
-    c.save_config()
-    c.disconnect()
-
-
-
-
-# CONFIGURING CRYPTO-ALGORITHMS:
-#  These are the parameters that will be used for IKE phase 1 and IKE phase 2 Negotiations;
-jinja_templates = input('Input directory path:')  
-IKE_policy_number = input('Input IKE policy number: ')
-
-for devices in chain(
-                     HQ_routers.values(),
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()
-                     ):
-  c = ConnectHandler(**devices)
-  c.enable() 
-
-  data = {
-           'IKE_policy_number': IKE_policy_number
-         } 
-
-  env = Environment(loader=FileSystemLoader(jinja_templates))
-  template = env.get_template("crypto.j2")
-  
-  commands = template.render(data).splitlines()
-  print(c.send_config_set(commands))
-
-  
-
-
 ## DISABLING LLDP AND CPD ON INTERNET FACING INTERFACES:
 
 for devices in chain(
