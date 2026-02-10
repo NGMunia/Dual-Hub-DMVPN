@@ -5,13 +5,18 @@ from csv import writer
 
 
 
-# DEVICE DOCUMENTATION
+# DEVICE INVETORY
 
 filepath = input('input the folder path where device inventory will be stored: ')
 with open(f'{filepath}/Data.csv','w') as f:
     write_data = writer(f)
     write_data.writerow(['Hostname','IP-Address','Software-Image','Version','Serial-No','Hardware'])
-    for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), Region_C.values()):
+    for Devices in chain(
+                         HQ_routers.values(), 
+                         Region_A.values(), 
+                         Region_B.values(), 
+                         Region_C.values()
+                        ):
         conn = ConnectHandler(**Devices)
         conn.enable()
         output = conn.send_command('show version',use_textfsm=True)[0]
@@ -29,9 +34,15 @@ with open(f'{filepath}/Data.csv','w') as f:
         print(f" Finished taking and Documenting {hostname} information" )
 
 
-## DEVICE RUNNING CONFIGURATIONS:
+
+## STORING START-UP CONFIGURATIONS:
 backup_filepath = input('Input the folder path where all startup configurations will be stored: ')
-for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), Region_C.values()):
+for Devices in chain(
+                     HQ_routers.values(), 
+                     Region_A.values(), 
+                     Region_B.values(), 
+                     Region_C.values()
+                    ):
     c = ConnectHandler(**Devices)
     c.enable()
 

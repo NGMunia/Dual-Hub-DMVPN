@@ -1,6 +1,6 @@
-Using 3301 out of 32768 bytes
+Using 3600 out of 32768 bytes
 !
-! Last configuration change at 08:02:09 UTC Sat Feb 7 2026 by Automation
+! Last configuration change at 16:21:37 UTC Sun Feb 8 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -146,6 +146,8 @@ interface Ethernet0/2
 interface Ethernet0/3
  ip address dhcp
  duplex auto
+ no cdp enable
+ no lldp transmit
 !
 !
 router eigrp EIGRP
@@ -157,6 +159,7 @@ router eigrp EIGRP
   exit-af-interface
   !
   topology base
+   distribute-list prefix EIGRP-filtered-prefixes in 
   exit-af-topology
   network 172.16.2.0 0.0.0.255
   network 192.168.0.0
@@ -174,6 +177,10 @@ ip ssh version 2
 ip access-list standard snmp_acl
  permit 172.16.255.254
 !
+!
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.0.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 ipv6 ioam timestamp
 !
 snmp-server community device_snmp RO snmp_acl

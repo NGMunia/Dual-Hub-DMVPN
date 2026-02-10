@@ -133,3 +133,22 @@ for devices in chain(
      c.save_config()
      c.disconnect()
     
+
+
+## DISABLING LLDP AND CPD ON INTERNET FACING INTERFACES:
+
+for devices in chain(
+                     Region_A.values(),
+                     Region_B.values(),
+                     Region_C.values(),
+                     HQ_routers.values()
+                    ):
+    c = ConnectHandler(**devices)
+    c.enable()
+
+    commands = ['interface e0/3',
+                'no cdp enable',
+                'no lldp transmit']
+    print(c.send_config_set(commands),'\n')
+    c.save_config()
+    c.disconnect()

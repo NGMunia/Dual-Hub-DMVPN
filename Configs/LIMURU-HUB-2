@@ -1,6 +1,6 @@
-Using 3437 out of 32768 bytes
+Using 3470 out of 32768 bytes
 !
-! Last configuration change at 09:05:26 UTC Sat Feb 7 2026 by Automation
+! Last configuration change at 16:21:50 UTC Sun Feb 8 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -140,6 +140,8 @@ interface Ethernet0/3
  ip nat outside
  ip virtual-reassembly in
  duplex auto
+ no cdp enable
+ no lldp transmit
 !
 !
 router eigrp EIGRP

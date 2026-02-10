@@ -6,7 +6,7 @@ When combined with IPsec, DMVPN provides secure, encrypted site-to-site communic
 ![DMVPN](https://img.shields.io/badge/DMVPN-Phase2-blue)
 ![IPsec](https://img.shields.io/badge/IPsec-Secure-red)
 ![Automation](https://img.shields.io/badge/Automation-Python-green)
-![EIGRP](https://img.shields.io/badge/EIGRP-ECMP-orange)
+![Routing](https://img.shields.io/badge/Routing-EIGRP-orange)
 
 ---
 ![Topology](/Topology.png)
