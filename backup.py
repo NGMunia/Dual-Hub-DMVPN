@@ -10,18 +10,14 @@ from csv import writer
 
 
 
-# DEVICE INVETORY
+# # DEVICE INVETORY
 # - This script will parse all network devices and collect critical information such as: 
 #     - Software information
 #     - Software version
 #     - Serial numbers
 #     - Hardware models
-#  Automated Network Inventory Engine
-#  Function: Programmatically audits multi-region network infrastructure to collect critical asset data (Software image, version, serial numbers, 
-#  and hardware models).
-#  Workflow: Leverages Netmiko for SSH connectivity and TextFSM to parse unstructured CLI data into structured Python dictionaries.
-#  Output: Generates a centralized CSV inventory report.
-
+#  A .csv file will then be created with the writer feature and document the values collected and
+#  structued in a dict format using TextFSM
 
 filepath = input('input the folder path where device inventory will be stored: ')
 with open(f'{filepath}/Data.csv','w') as f:
