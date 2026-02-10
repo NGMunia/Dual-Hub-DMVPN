@@ -89,51 +89,6 @@ for devices in chain(
 
   
 
-## CONFIGURE LAN IPs
-for devices in chain(
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()
-                     ):
-     c = ConnectHandler(**devices)
-     c.enable()
-     hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
-
-     ip = input(f'Input the LAN IP address and subnet mask whose gateway is {hostname}: ')
-     intf = input('LAN interface: ')
-
-     commands = [f'interface {intf}',
-                 f'ip address {ip}',
-                 'no shut'
-                ]
-     
-     print(c.send_config_set(commands),'\n')
-     c.save_config()
-     c.disconnect()
-
-
-## ADVERTISING NEW NETWORKS ON EIGRP AS
-for devices in chain(
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()
-                     ):
-     c = ConnectHandler(**devices)
-     c.enable()
-     hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
-
-     network = input(f'Input the LAN network and wildcard mask attached to {hostname} you wish to advertise: ')
-
-     commands = ['router eigrp EIGRP',
-                 'address-family ipv4 autonomous-system 100',
-                 f'network {network}'
-                ]
-     
-     print(c.send_config_set(commands),'\n')
-     c.save_config()
-     c.disconnect()
-    
-
 
 ## DISABLING LLDP AND CPD ON INTERNET FACING INTERFACES:
 
