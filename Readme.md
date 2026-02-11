@@ -267,7 +267,8 @@ for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), 
                 'snmp-server community device_snmp snmp_acl',
                 'snmp-server system-shutdown',
                 'snmp-server enable traps config',
-                'snmp-server host 10.1.30.254 version 2c device_snmp']
+                'snmp-server host 10.1.30.254 version 2c device_snmp'               
+               ]
     print(c.send_config_set(commands))
 ```
 
