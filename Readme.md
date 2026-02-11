@@ -214,7 +214,12 @@ Note: SSH must be enabled first for Netmiko to work.
 Below is a snippet 
 
 ```python
-for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), Region_C.values()):
+for Devices in chain(
+                      HQ_routers.values(), 
+                      Region_A.values(), 
+                      Region_B.values(), 
+                      Region_C.values()
+                    ):
     c = ConnectHandler(**Devices)
     c.enable()
 
