@@ -237,8 +237,8 @@ for devices in chain(
                      HQ_routers.values(),
                      Region_A.values(), 
                      Region_B.values(), 
-                     Region_C.values()
-                     ):
+                     Region_C.values()            
+                    ):
   c = ConnectHandler(**devices)
   c.enable()
   hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
