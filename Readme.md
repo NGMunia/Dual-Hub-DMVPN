@@ -55,7 +55,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 - Centralized Windows server provides:
   - DHCP
   - SNMP, Syslog, Netflow
-  - Network monitoring (PRTG)  
+  - Network monitoring (PRTG) 
 
 
 

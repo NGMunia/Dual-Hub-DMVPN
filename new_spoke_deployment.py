@@ -96,11 +96,12 @@ banner_commands = [
                    f'{"#  "}Unauthorized access is strictly forbidden',
                    f'{"#"*50}',
                   '@'
-                 ]
+                  ]
 print(c.send_config_set(banner_commands),'\n')
 
 
 ## Configuring Cryptography:
+# - This script configures IPsec over DMVPN tunnels.
 IKE_policy_number = input('Input IKE policy number: ')
 crypto_data = {
                 'IKE_policy_number': IKE_policy_number
