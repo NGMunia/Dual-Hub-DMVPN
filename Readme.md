@@ -27,7 +27,6 @@ Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure c
 This lab project demostrates dual-hub DMVPN design with the following:
 
 - **Routing:** EIGRP with ECMP for dual-hub traffic load-sharing 
-- **Redisribution** Hub routers redistribute OSPF and EIGRP routess to the mGRE tunnels and fortigate firewall respectively 
 - **Overlay Security:** IPsec-protected DMVPN tunnels  
 - **Automation:** Python-Netmiko
 - **Monitoring:** PRTG, SNMP, NetFlow  
