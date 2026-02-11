@@ -172,9 +172,9 @@ outer eigrp EIGRP
  exit-address-family
 !
 !
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.2.0/23 le 32
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 le 32
-ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
+ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.2.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 ge 24
+ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 ge 24
 
 ```
 

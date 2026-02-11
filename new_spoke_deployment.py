@@ -29,7 +29,7 @@ c = ConnectHandler(**new_spoke)
 c.enable()
 hostname_commands = [f'hostname {hostname}']
 print(c.send_config_set(hostname_commands),'\n')
-
+c.save_config()
 
 # # Configuring the DMVPN tunnels:
 print('-----CONFIGURING THE TUNNELS OF THE NEW SPOKE-----')
@@ -52,7 +52,6 @@ print(c.send_config_set(commands))
 # CONFIGURE NEW LAN IPs
 # - This script will configure LAN IP(s) of the new spoke deployed.
 # - Specify the correct IP and subnet mask.
-
 print('-----CONFIGURING LAN IP AND SUBNET MASK-----')
 ip = input(f'Input the LAN IP address and subnet mask whose gateway is {hostname}: ')
 intf = input('LAN interface: ')
@@ -61,15 +60,14 @@ intf_commands = [
                  f'interface {intf}',
                  f'ip address {ip}',
                  'no shut'
-                ]
-     
+                ]    
 print(c.send_config_set(intf_commands),'\n')
+
 
 
 ## ADVERTISING NEW NETWORKS ON EIGRP AS:
 # - This script will configure EIGRP to advertise the new subnets on the new spoke deployed:
 # - The right network and wildcard mask is critical.
-
 print('-----CONFIGURING EIGRP----')                    
 lan_network = input(f'Input the LAN network and wildcard mask attached to {hostname} you wish to advertise: ')
 tunnel0_network = input(f'Input the Tunnel0 network and wildcard mask attached to {hostname}: ')
