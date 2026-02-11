@@ -41,7 +41,8 @@ data = {
         'tunnel0_ip':tunnel0_ip,
         'tunnel1_ip':tunnel1_ip,
         'tunnel0_source_ip':tunnel0_source_IP
-        }
+       }
+
 jinja_templates = input('select the directory path of the Jinja Template used for configurations: ')
 env = Environment(loader=FileSystemLoader(jinja_templates))
 template = env.get_template("spoke.j2")
