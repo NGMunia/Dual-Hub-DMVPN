@@ -16,14 +16,14 @@ from jinja2 import FileSystemLoader, Environment
 #  Configuring the Hostname
 print('----CONFIGURING THE HOSTNAME OF THE NEW SPOKE-----')
 hostname = input('Specify the Hostname of the new spoke: ')
-public_ip = input('What is the public IP on the new router: ')
+public_ip = input(f'What is the public IP address configured on {hostname}? ')
 new_spoke =  {
                   'device_type':'cisco_ios',
                   'username':Username,
                   'password': password,
                   'secret':enable_password,
                   'ip': public_ip
-              } 
+             } 
 
 c = ConnectHandler(**new_spoke)
 c.enable()
