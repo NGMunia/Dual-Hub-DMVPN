@@ -148,7 +148,7 @@ router eigrp EIGRP
  exit-address-family
  ```
 
-
+---
 ## Route filtering (Objective 2)
 EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes egressing the router as shown.
 This is done in conjuction with prefix lists:
@@ -246,7 +246,7 @@ for devices in chain(
   output = c.send_command('show ip route eigrp','\n')
   print(f'\n\n{hostname}\n,{output}')
 ```
-
+---
 ## Network Assurance (Objective 5)
 SNMP can be configured to send unsolicited traps to notify an NMS of important events such as interface up/down, device reboots, or threshold-based alerts (e.g. high CPU usage).
 
