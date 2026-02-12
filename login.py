@@ -1,5 +1,8 @@
 
 
+# Login credentials used to access the network devices via SSH
+# Netmiko uses these credentials to log in into the devices remotely
+
 from getpass import getpass
 
 Username = input('Username: ')

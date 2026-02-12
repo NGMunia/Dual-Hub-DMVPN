@@ -4,7 +4,7 @@
 #  - The hub routers' static public IPs should be known for NHRP packets exchange
 #  - The new spoke out of the box must be configured for SSH remote connection
 #  - The login credentials must be configured as those in the login  script, to ensure consistency across board
-#  - A default route must be configured
+#  - A default static route pointing to the ISP must be configured
 #  - (Optional) A unique hostname may be configured.
 
 
@@ -15,8 +15,7 @@ from jinja2 import FileSystemLoader, Environment
 
 #  Configuring the Hostname
 print('----CONFIGURING THE HOSTNAME OF THE NEW SPOKE-----')
-hostname = input('Specify the Hostname of the new spoke: ')
-public_ip = input(f'What is the public IP address configured on {hostname}? ')
+public_ip = input(f'What is the public IP address configured on the new spoke? ')
 new_spoke =  {
                   'device_type':'cisco_ios',
                   'username':Username,
@@ -24,12 +23,10 @@ new_spoke =  {
                   'secret':enable_password,
                   'ip': public_ip
              } 
-
 c = ConnectHandler(**new_spoke)
 c.enable()
-hostname_commands = [f'hostname {hostname}']
-print(c.send_config_set(hostname_commands),'\n')
-c.save_config()
+
+hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
 
 # # Configuring the DMVPN tunnels:
 print('-----CONFIGURING THE TUNNELS OF THE NEW SPOKE-----')
@@ -88,7 +85,7 @@ print(c.send_config_set(eigrp_commands),'\n')
 # CONFIGURING MOTD BANNER:
 # - This is the welcome banner you see when you login remotely on the device:
 print('CONFIGURING MOTD BANNER')
-banner_commands = [
+banner_commands = [ 
                     'banner login @',
                    f'{"#"*50}',
                    f'{"#  "}{hostname}',

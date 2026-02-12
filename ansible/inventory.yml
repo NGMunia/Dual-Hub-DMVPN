@@ -1,0 +1,23 @@
+
+---
+all:
+  children:
+    routers:
+      hosts:
+        LMR-HQ-1:
+          ansible_host: 172.16.255.1
+        LMR-HQ-2:
+          ansible_host: 172.16.255.2
+        MSA-TX-StATION:
+          ansible_host: 172.16.0.1
+        MLD-TX-STATION:
+          ansible_host: 172.16.1.1
+        NKR-TX-STATION:
+          ansible_host: 172.16.2.1
+        LDN-TX-STATION:
+          ansible_host: 172.16.3.1
+        KSM-TX-STATION:
+          ansible_host: 172.16.4.1
+        KSI-TX-STATION:
+          ansible_host: 172.16.5.1
+-

@@ -51,3 +51,10 @@ for devices in chain(
   print(f'\n\n{hostname}\n,{output}')
 
 
+# VERIFYING EIGRP NERIGHBORS ON HUB ROUTERS
+for devices in chain(HQ_routers.values()):
+  c = ConnectHandler(**devices)
+  c.enable()
+  
+  hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
+  print(f'{hostname}\n',c.send_command('show ip eigrp neighbors','\n'))
