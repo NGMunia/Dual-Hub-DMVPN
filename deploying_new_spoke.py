@@ -110,6 +110,33 @@ crypto_commands = template.render(crypto_data).splitlines()
 print(c.send_config_set(crypto_commands))
 
 
+# Configuring SNMP SERVER
+# - This script configures the NMS server where SNMP traps will be sent.
+print('-----Configuring SNMP server on the spoke-----')
+snmp_server = input('Whar is the IP address of SNMP Server?  ')
+data = {
+           'snmp_server_ip':snmp_server 
+       } 
+
+env = Environment(loader=FileSystemLoader(jinja_templates))
+template = env.get_template("snmp.j2")
+  
+snmp_commands = template.render(data).splitlines()
+print(c.send_config_set(snmp_commands))
+
+
+
+# Disbaling CDP and LLPD on internet-facing Links:
+# - This script disables neigbor discovery from the internet.
+print('----Disabling CDP and LLDP on internet-facing links-----')
+cdp_commands = [
+                f'interface {tunnel0_source_IP}',
+                'no cdp enable',
+                'no lldp transmit'
+               ]
+print(c.send_config_set(cdp_commands),'\n')
+
+
 ## SAVE ALL CONFIGURATIONS:
 print('Saving all configurations....')
 c.save_config()
