@@ -13,8 +13,8 @@ from login import password, Username, enable_password
 from netmiko import ConnectHandler
 from jinja2 import FileSystemLoader, Environment
 
-#  Configuring the Hostname
-print('----CONFIGURING THE HOSTNAME OF THE NEW SPOKE-----')
+#  Accessing the Public IP of the new Spoke
+print('----ACCESSING THE PUBLIC IP ADDRESS/DOMAIN-NAME OF THE NEW SPOKE-----')
 public_ip = input(f'What is the public IP address configured on the new spoke? ')
 new_spoke =  {
                   'device_type':'cisco_ios',
@@ -28,7 +28,7 @@ c.enable()
 
 hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
 
-# # Configuring the DMVPN tunnels:
+# Configuring the DMVPN tunnels:
 print('-----CONFIGURING THE TUNNELS OF THE NEW SPOKE-----')
 tunnel0_ip = input(f'Whats the IP address of tunnel0 of {hostname}?  ')
 tunnel1_ip = input(f'Whats the IP address of tunnel1 of {hostname}?  ')
@@ -68,23 +68,21 @@ print(c.send_config_set(intf_commands),'\n')
 # - The right network and wildcard mask is critical.
 print('-----CONFIGURING EIGRP----')                    
 lan_network = input(f'Input the LAN network and wildcard mask attached to {hostname} you wish to advertise: ')
-tunnel0_network = input(f'Input the Tunnel0 network and wildcard mask attached to {hostname}: ')
-tunnel1_network = input(f'Input the Tunnel0 network and wildcard mask attached to {hostname}: ')
 eigrp_commands = [
                    'router eigrp EIGRP',
                    'address-family ipv4 autonomous-system 100',
                    'af-interface default',
                    'bandwidth-percent 25',
                   f'network {lan_network}',
-                  f'network {tunnel0_network}',
-                  f'network {tunnel1_network}'
+                   'network 192.168.1.0',
+                   'network 192.168.0.0'
                  ]    
 print(c.send_config_set(eigrp_commands),'\n')
 
 
 # CONFIGURING MOTD BANNER:
 # - This is the welcome banner you see when you login remotely on the device:
-print('CONFIGURING MOTD BANNER')
+print('-----CONFIGURING MOTD BANNER-----')
 banner_commands = [ 
                     'banner login @',
                    f'{"#"*50}',
@@ -93,13 +91,14 @@ banner_commands = [
                    f'{"#  "}BROADCAST TRANSMISSION DEPARTMENT',
                    f'{"#  "}Unauthorized access is strictly forbidden',
                    f'{"#"*50}',
-                  '@'
+                    '@'
                   ]
 print(c.send_config_set(banner_commands),'\n')
 
 
 ## Configuring Cryptography:
 # - This script configures IPsec over DMVPN tunnels.
+print('------CONFIGURING CRYPTOGRAPHY (IPSEC)-----')
 IKE_policy_number = input('Input IKE policy number: ')
 crypto_data = {
                 'IKE_policy_number': IKE_policy_number
@@ -112,5 +111,6 @@ print(c.send_config_set(crypto_commands))
 
 
 ## SAVE ALL CONFIGURATIONS:
+print('Saving all configurations....')
 c.save_config()
 c.disconnect()

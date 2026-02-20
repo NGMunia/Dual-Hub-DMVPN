@@ -74,3 +74,23 @@ Region_C =  {
                          'ip':'192.168.1.7'
                         } 
             }
+Region_D =  {
+    
+          
+             'R9': {
+                         'device_type':'cisco_ios',
+                         'username':Username,
+                         'password': password,
+                         'secret':enable_password,
+                         'ip':'192.168.0.9',
+                         'ip':'192.168.1.9'
+                       },
+            'R10': {
+                         'device_type':'cisco_ios',
+                         'username':Username,
+                         'password': password,
+                         'secret':enable_password,
+                         'ip':'192.168.0.10',
+                         'ip':'192.168.1.10'
+                        } 
+            }
