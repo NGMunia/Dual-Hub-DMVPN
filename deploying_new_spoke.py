@@ -14,7 +14,7 @@ from netmiko import ConnectHandler
 from jinja2 import FileSystemLoader, Environment
 
 #  Accessing the Public IP of the new Spoke
-print('----ACCESSING THE PUBLIC IP ADDRESS/DOMAIN-NAME OF THE NEW SPOKE-----')
+print('----CONNECTING TO THE NEW SPOKE-----')
 public_ip = input(f'What is the public IP address configured on the new spoke? ')
 new_spoke =  {
                   'device_type':'cisco_ios',
