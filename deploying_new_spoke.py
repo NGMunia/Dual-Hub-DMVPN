@@ -7,6 +7,7 @@
 #  - The new spoke out of the box must be configured for SSH remote connection
 #  - The login credentials must be configured as those in the login  script, to ensure consistency across board
 #  - A default static route pointing to the ISP must be configured
+#  - A public IP must be configured statically or dynamically assigned to a known interface for reachability
 #  - (Optional) A unique hostname may be configured.
 
 
@@ -181,7 +182,7 @@ try:
     c.disconnect()
 
 
-    
+
 # Displays errors encountered while running the script
 except TimeoutError:
     print(f'Connection Timeout!!! Check if the IP {public_ip} is reachable and SSH is enabled!! ')
