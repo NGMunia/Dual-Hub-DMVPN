@@ -185,11 +185,11 @@ try:
     print(c.send_config_set(banner_commands),'\n')
 
 ## SAVE ALL CONFIGURATIONS:
-# -This will save all the configurarions;
+# -This will save all the configurarions and ends the SSH session
     print('Saving all configurations....')
-    print('THE SPOKE HAS BEEN SUCCESSFULLY DEPLOYED TO THE DMVPN NETWORK!')
     c.save_config()
     c.disconnect()
+    print('THE SPOKE HAS BEEN SUCCESSFULLY DEPLOYED TO THE DMVPN NETWORK, REMOTE SESSION ENDED.')
 
 
 
