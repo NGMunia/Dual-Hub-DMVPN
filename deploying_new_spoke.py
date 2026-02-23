@@ -31,8 +31,9 @@ import ipaddress
 # ACCESSING THE NEW SPOKE...........
 print('Connecting to the new SPOKE........')
 # This tests the validilty and the structure of the IP address provided.
-# Python in itself cannot disern whether the IP address input is valid or not.
+# Python in itself cannot discern whether the IP address input is valid or not.
 # Therefore it uses the ipaddress module to ascertain this.
+
 while True:
     try:
         public_ip = input(f'What is the public IP address configured on the new spoke? ')
@@ -48,10 +49,11 @@ new_spoke =  {
                   'ip': public_ip
              }
 
-
-# Once the IP address is deemed valid, Netmiko will try to conect to the device (through SSH), via the IP address provided
+# Once the IP address is deemed valid, Netmiko will try to conect to the device, via SSH, using the Key/value pairs (including the IP), under new spoke.
 # It does this using the connecthandler module.
+# The IP address must be reachable and SSH must be configured to allow connection, includiing the IP address/subnet to which the SDN controller belongs.
 # The script once connected will extract the hostname of the network device using the structuring mooule TextFSM.
+
 try:
     c = ConnectHandler(**new_spoke)
     c.enable()
