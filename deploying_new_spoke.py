@@ -14,6 +14,15 @@
 #  - (Optional) A unique hostname may be configured.
 
 
+# CONFIGURATIONS DONE:
+# The following configurations are done:
+# - mGRE tunnels and IPsec
+# - LAN 
+# - EIGRP
+# - SNMP
+# - MOTD login Banner
+# - Disabling CDP and LLDP on internet-facing interfaces
+
 
 from login import password, Username, enable_password
 from netmiko import ConnectHandler
