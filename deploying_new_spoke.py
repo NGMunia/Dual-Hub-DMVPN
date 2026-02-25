@@ -16,7 +16,7 @@
 
 # CONFIGURATIONS DONE:
 # The following configurations are done:
-# - mGRE tunnels and IPsec
+# - mGRE tunnels and IPSec
 # - LAN 
 # - EIGRP
 # - SNMP
