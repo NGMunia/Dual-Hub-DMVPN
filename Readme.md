@@ -210,7 +210,14 @@ Python uses netmiko libraries to automate network devices.
 Netmiko uses SSH as its southbound interface to login to devices and send confguration commands.
 Note: SSH must be enabled first for Netmiko to work.
 
-Below is a snippet 
+Onboarding a new spoke has been automated to allow for faster deployment of ner branch networks and minimize configuration errors
+The script can be seen here:
+
+```bash
+/deploying_new_spoke.py
+```
+
+Below is a snippet that fetches the start-up configurations of all network devices:
 
 ```python
 for Devices in chain(
