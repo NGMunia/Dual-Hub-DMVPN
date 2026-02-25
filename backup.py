@@ -1,5 +1,5 @@
 
-
+# SCOPE:
 # The following scripts are used to back up configurations and fetch critical device health and document them for
 # reference.
 

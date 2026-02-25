@@ -1,9 +1,12 @@
 
-
-
 # NEW SPOKE DEPLOYMENT
+# - This script is intended to onboard a new spoke to the DMVPN cloud.
+# - It facilitates faster deployement of new branch networks to the DMVPN cloud reducing minimum time required to configure 
+#   a new spoke and reduce configuration errors.
+
+
 # Prerequisites: 
-#  - The hub routers' static public IPs should be known for NHRP packets exchange
+#  - The hub routers' static public IPs must be reachable from the new spoke to allow for NHRP packets exchange
 #  - The new spoke out of the box must be configured for SSH remote connection
 #  - The login credentials must be configured as those in the login  script, to ensure consistency across board
 #  - A default static route pointing to the ISP must be configured
@@ -176,7 +179,7 @@ try:
                          'banner login @',
                         f'{"#"*50}',
                         f'{"#  "}{hostname}',
-                        f'{"#  "}ROYAL MEDIA SERVICES LIMITED',
+                        f'{"#  "}BROADCAST MEDIA SERVICES LTD',
                         f'{"#  "}BROADCAST TRANSMISSION DEPARTMENT',
                         f'{"#  "}Unauthorized access is strictly forbidden',
                         f'{"#"*50}',
