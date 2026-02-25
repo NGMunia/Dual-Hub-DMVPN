@@ -25,7 +25,7 @@
 
 
 from login import password, Username, enable_password
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler, NetMikoTimeoutException
 from jinja2 import FileSystemLoader, Environment
 import ipaddress
 
@@ -206,7 +206,7 @@ try:
 
 
 # Displays errors encountered while running the script
-except TimeoutError:
+except NetMikoTimeoutException:
     print(f'Connection Timeout!!! Check if the IP {public_ip} is reachable and SSH is enabled!! ')
     exit()
 except Exception as e:
