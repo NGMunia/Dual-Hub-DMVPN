@@ -149,7 +149,7 @@ router eigrp EIGRP
 
 ---
 ## Route filtering (Objective 2)
-EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes egressing the router as shown.
+EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes ingressing the router as shown.
 This is done in conjuction with prefix lists:
 The snippet below EIGRP filters 192.168.10.0/24, 172.16.2.0/24, 172.16.3.0/24, 172.16.4.0/24 and 172.16.5.0/24 prefixes and allows all other prefixes to be added in the RIB
 
