@@ -303,7 +303,9 @@ for Devices in chain(
         lan_intf = input(f'What is the LAN interface on {hostname} to be configured with DHCP relay? ')
 
         commands = [f'interface {lan_intf}',
-                    'ip helper-address 172.16.255.254']
+                    'ip helper-address 172.16.255.254'
+                   ]
+        print(c.send_config_set(commands),'\n')
         print(f'Router {hostname} has been configured with DHCP relay')
         c.save_config()
         c.disconnect()
