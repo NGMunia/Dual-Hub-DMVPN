@@ -278,14 +278,14 @@ for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), 
     print(c.send_config_set(commands))
 ```
 
-## Centralized Services (Objective 6)
+# Centralized Services (Objective 6)
 
 - Each branch site maintains a local Internet connection  
 - Windows Server provides:
   - DHCP and DNS for all branches  
   - Network monitoring via **PRTG**  
 
-# Configuring Centralized DHCP (DHCP relay:)
+## Configuring Centralized DHCP (DHCP relay:)
 
 ```python
 
