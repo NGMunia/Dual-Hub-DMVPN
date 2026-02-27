@@ -26,11 +26,11 @@ Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure c
 ## Quick Overview
 This lab project demostrates dual-hub DMVPN design with the following:
 
-- **Routing:** EIGRP with ECMP for dual-hub traffic load-sharing 
+- **Routing:** EIGRP named mode
 - **Overlay Security:** IPsec-protected DMVPN tunnels  
 - **Automation:** Python-Netmiko
 - **Monitoring:** PRTG, SNMP, NetFlow  
-- **Services:** Centralized DHCP, DNS, NTP 
+- **Services:** Centralized DHCP, DNS,NTP 
 
 ---
 
@@ -285,6 +285,35 @@ for Devices in chain(HQ_routers.values(), Region_A.values(), Region_B.values(), 
   - DHCP and DNS for all branches  
   - Network monitoring via **PRTG**  
 
+# Configuring Centralized DHCP (DHCP relay:)
+
+```python
+
+for Devices in chain(
+                     Region_A.values(), 
+                     Region_B.values(), 
+                     Region_C.values()
+                    ):
+    try:
+        c = ConnectHandler(**Devices)
+        c.enable()
+
+        hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
+
+        lan_intf = input(f'What is the LAN interface on {hostname} to be configured with DHCP relay? ')
+
+        commands = [f'interface {lan_intf}',
+                    'ip helper-address 172.16.255.254']
+        print(f'Router {hostname} has been configured with DHCP relay')
+        c.save_config()
+        c.disconnect()
+    except NetMikoTimeoutException:
+        print('Unable to connect. Check if SSH is enabled and the Network device is reachable!! ')
+    except Exception as e:
+        print(f'Error ,{e}')
+        exit()
+```
+### Monitoring with PRTG:
 
 ![Topology](/PRTG.PNG)
 ---
