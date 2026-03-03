@@ -60,7 +60,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 
 ---
-## Redunndancy:
+# Redunndancy:
 
 ### VRRPv3:
 The Hub architecture is implemented with VRRPv3 as the FHRP on the internet gateway hubs.
@@ -143,7 +143,7 @@ track 1 ip sla 1
 ---
 
 
-## Routing & DMVPN Design (Objective 1)
+# Routing & DMVPN Design (Objective 1)
 
 ### mGRE tunnels:
 
@@ -231,7 +231,7 @@ router eigrp EIGRP
  ```
 
 ---
-## Route filtering (Objective 2)
+# Route filtering (Objective 2)
 EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes ingressing the router as shown.
 This is done in conjuction with prefix lists:
 The snippet below EIGRP filters 192.168.10.0/24, 172.16.2.0/24, 172.16.3.0/24, 172.16.4.0/24 and 172.16.5.0/24 prefixes and allows all other prefixes to be added in the RIB
@@ -262,7 +262,7 @@ ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
 
 ---
 
-## IPsec & Security (Objective 3)
+# IPsec & Security (Objective 3)
 
 - All DMVPN tunnels are secured using **IPsec**  
 - Ensures confidentiality, integrity, and authentication across the WAN  
@@ -287,8 +287,9 @@ crypto ipsec profile crypt-profile
  set transform-set crypto_ts 
 !
 ```
+---
 
-## Automating the Network (Objective 4)
+# Automating the Network (Objective 4)
 Python uses netmiko libraries to automate network devices.
 Netmiko uses SSH as its southbound interface to login to devices and send confguration commands.
 Note: SSH must be enabled first for Netmiko to work.
@@ -336,7 +337,8 @@ for devices in chain(
   print(f'\n\n{hostname}\n,{output}')
 ```
 ---
-## Network Assurance (Objective 5)
+
+# Network Assurance (Objective 5)
 SNMP can be configured to send unsolicited traps to notify an NMS of important events such as interface up/down, device reboots, or threshold-based alerts (e.g. high CPU usage).
 
 An NMS (Network Management System) receives these traps and may also poll devices via SNMP to collect performance metrics like CPU and interface utilization, presenting the data in human-readable dashboards and graphs.
@@ -365,7 +367,7 @@ for Devices in chain(
                ]
     print(c.send_config_set(commands))
 ```
-
+---
 # Centralized Services (Objective 6)
 
 - Each branch site maintains a local Internet connection  
