@@ -26,6 +26,7 @@ Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure c
 ## Quick Overview
 This lab project demostrates dual-hub DMVPN design with the following:
 
+- **Redundancy:** VRRPv3 with Object tracking
 - **Routing:** EIGRP named mode
 - **Overlay Security:** IPsec-protected DMVPN tunnels  
 - **Automation:** Python-Netmiko
@@ -36,7 +37,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 ## Project Objectives
 
-- Implement a dual-hub DMVPN architecture with branch redundancy  
+- Implement a dual-hub DMVPN architecture with redundancy  
 - Segregate the branch spokes in geographic regions and filter traffic so that regions receive HQ prefixes and prefixes within their regions.
 - Secure all tunnels using IPsec cryptography  
 - Automate repetitive configurations and device management   
@@ -59,6 +60,86 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 
 ---
+## Redunndancy:
+
+### VRRPv3:
+The Hub architecture is implemented with VRRPv3 as the FHRP on the internet gateway hubs.
+VRRP allows multiple gatewy routers to appear as one virtual default gateway to hosts, with one router as the MASTER the other as BACKUP.
+VRRPv3 supports both IPv4 and IPv6
+
+*ON ROUTER-1*
+
+```bash
+interface Ethernet0/0
+ ip address 172.16.255.1 255.255.255.0
+
+ vrrp 10 address-family ipv4
+  priority 110
+  vrrpv2
+  track 1 decrement 60
+  address 172.16.255.3 primary
+  exit-vrrp
+```
+
+*ON ROUTER-2*
+
+```bash
+interface Ethernet0/0
+ ip address 172.16.255.2 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
+ duplex auto
+ vrrp 10 address-family ipv4
+  address 172.16.255.3 primary
+  exit-vrrp
+```
+
+### IPSLA and Object tracking:
+
+IPSLA is a feature that allows the router to actively generate traffic to measure perfomance or availability of the network.
+
+With IPSLA the touter detects remote network failure (and switches path depending on the config)
+
+IPSLA works together with object tracking so that if a network tests fail or pass (IPSLA), then an action (Object tracking) will be undetaken.
+
+In the case above, IPSLA/Object-tracking/VRRP are used this way.
+ 
+  -  IPSLA tests the reachability of ISP network (32.19.86.1) through LMR_HQ1 (ICMP pings)
+  -  If reachanility fails, Object tracker picks up on this and decrements the VRRP priority on LMR_HQ1 to alower value (by 60) than that of LMR_HQ2
+  -  VRRP picks this up and electes LMR_HQ2 as now the master router by the virtual of higher priority number.
+  -  Traffic now goes via LMR_HQ1
+
+### Preemption:
+When network reachability is restored, LMR_HQ1 advertises a higher priority to LMR_HQ2 (preemption) and it resumes as the Master router.
+
+*IPSLA configuration*
+
+```bash
+ip sla 1
+ icmp-echo 32.19.86.1 source-interface Ethernet0/3
+ frequency 10
+ip sla schedule 1 life forever start-time now
+```
+
+*COnfigurating VRRP with Object-tracking*
+
+```bash
+track 1 ip sla 1
+ delay down 10 up 10
+
+
+!interface Ethernet0/0
+ ip address 172.16.255.1 255.255.255.0
+ vrrp 10 address-family ipv4
+  priority 110
+  vrrpv2
+  track 1 decrement 60
+  address 172.16.255.3 primary
+  exit-vrrp
+```
+
+---
+
 
 ## Routing & DMVPN Design (Objective 1)
 

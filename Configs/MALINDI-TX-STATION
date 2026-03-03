@@ -1,6 +1,6 @@
-Using 3602 out of 32768 bytes
+Using 3637 out of 32768 bytes
 !
-! Last configuration change at 16:21:34 UTC Sun Feb 8 2026 by Automation
+! Last configuration change at 09:02:41 UTC Fri Feb 27 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -131,6 +131,7 @@ interface Tunnel1
 !
 interface Ethernet0/0
  ip address 172.16.1.1 255.255.255.0
+ ip helper-address 172.16.255.254
  duplex auto
 !
 interface Ethernet0/1
