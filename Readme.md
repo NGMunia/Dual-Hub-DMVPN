@@ -109,7 +109,9 @@ In the case above, IPSLA/Object-tracking/VRRP are used this way.
   -  VRRP picks this up and electes LMR_HQ2 as now the master router by the virtual of higher priority number.
   -  Traffic now goes via LMR_HQ1
 
+
 ### Preemption:
+
 When network reachability is restored, LMR_HQ1 advertises a higher priority to LMR_HQ2 (preemption) and it resumes as the Master router.
 
 *IPSLA configuration*
@@ -121,7 +123,7 @@ ip sla 1
 ip sla schedule 1 life forever start-time now
 ```
 
-*COnfigurating VRRP with Object-tracking*
+*Configuring VRRP with Object-tracking*
 
 ```bash
 track 1 ip sla 1
