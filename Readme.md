@@ -304,9 +304,7 @@ The script can be seen here:
 
 [Deploying new spoke](/deploying_new_spoke.py)
 
-```bash
-/deploying_new_spoke.py
-```
+
 
 Below is a snippet that fetches the start-up configurations of all network devices:
 
