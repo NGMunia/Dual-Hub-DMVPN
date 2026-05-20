@@ -302,7 +302,7 @@ Onboarding a new spoke has been automated to allow for faster deployment of ner 
 The script can be seen here:
 
 
-[C:\Users\melvi\Desktop\Dual-Hub-DMVPN\deploying_new_spoke.py](#C:\Users\melvi\Desktop\Dual-Hub-DMVPN\deploying_new_spoke.py)
+![Deploying new spoke](/deploying_new_spoke.py)
 
 ```bash
 /deploying_new_spoke.py
