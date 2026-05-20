@@ -301,6 +301,9 @@ Note: SSH must be enabled first for Netmiko to work.
 Onboarding a new spoke has been automated to allow for faster deployment of ner branch networks and minimize configuration errors
 The script can be seen here:
 
+
+[C:\Users\melvi\Desktop\Dual-Hub-DMVPN\deploying_new_spoke.py](#C:\Users\melvi\Desktop\Dual-Hub-DMVPN\deploying_new_spoke.py)
+
 ```bash
 /deploying_new_spoke.py
 ```
