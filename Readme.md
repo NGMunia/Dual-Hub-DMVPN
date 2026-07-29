@@ -1,7 +1,19 @@
 # Dual-Hub DMVPN Lab with IPsec
 
-DMVPN (Dynamic Multipoint VPN) enables scalable site-to-multiple-site connectivity between a headquarters (HQ) and geographically distributed branch offices. It uses the Internet as the transport network and GRE tunnels as the overlay, allowing dynamic routing between sites. 
-When combined with IPsec, DMVPN provides secure, encrypted site-to-site communications.
+# Dual-Hub DMVPN with IPsec
+
+This project implements a dual-hub DMVPN Phase II WAN secured with IPsec. The topology simulates an enterprise network with geographically distributed branch offices connected to redundant headquarters hubs using EIGRP.
+
+
+
+## Objective of the project:
+The objectives of this project are to:
+
+- Build a dual-hub DMVPN WAN
+- Secure all tunnel traffic using IPsec
+- Provide centralized network services to branch sites
+- Monitor the network from a central NOC
+- Automate repetitive configuration tasks using Python
 
 ![DMVPN](https://img.shields.io/badge/DMVPN-Phase2-blue)
 ![IPsec](https://img.shields.io/badge/IPsec-Secure-red)
@@ -23,6 +35,7 @@ DMVPN addresses these limitations with a hub-and-spoke architecture, allowing ra
 Additionally, DMVPN allows IPsec to run on top of GRE tunnels, ensuring secure communications between HQ and branch sites and also traffic between branch sites is also secured
 
 
+
 ## Quick Overview
 This lab project demostrates dual-hub DMVPN design with the following:
 
@@ -34,28 +47,30 @@ This lab project demostrates dual-hub DMVPN design with the following:
 - **Services:** Centralized DHCP, DNS,NTP 
 
 ---
+## Technologies used:
 
-## Project Objectives
-
-- Implement a dual-hub DMVPN architecture with redundancy  
-- Segregate the branch spokes in geographic regions and filter traffic so that regions receive HQ prefixes and prefixes within their regions.
-- Secure all tunnels using IPsec cryptography  
-- Automate repetitive configurations and device management   
-- Deploy centralized network services for branches (namely DHCP, Syslog, SNMP, Netflow) to the server.
-- Monitor traffic and device health with SNMP and PRTG  
+| Technology | Purpose |
+|------------|----------|
+| Cisco IOS | Routing and Switching |
+| DMVPN Phase II | WAN Overlay |
+| IPsec | Tunnel Encryption |
+| EIGRP Named Mode | Dynamic Routing |
+| VRRPv3 | Gateway Redundancy |
+| IP SLA | WAN Failure Detection |
+| Object Tracking | Automatic Failover |
+| Python & Netmiko | Automation |
+| SNMP | Device Monitoring |
+| NetFlow | Traffic Analysis |
+| Syslog | Centralized Logging |
+| PRTG | Network Monitoring |
+| Windows Server | DHCP, DNS and Monitoring |
 
 ---
 
 ## Lab Architecture
+The topology consists of two headquarters routers operating as redundant DMVPN hubs and multiple branch routers connected over the Internet.
 
-- Dual-hub DMVPN topology connecting multiple branch sites to HQ  
-- Each branch has its own Internet connection.  
-- Fortigate firewall sits behind the Hub routers to inspect incoming and outgoing traffic
-- IPsec secures the DMVPN tunnels end-to-end  
-- Centralized Windows server provides:
-  - DHCP
-  - SNMP, Syslog, Netflow
-  - Network monitoring (PRTG) 
+Each branch establishes tunnels to both hubs using mGRE and NHRP. EIGRP provides routing across the overlay while IPsec encrypts all tunnel traffic.
 
 
 
@@ -143,14 +158,12 @@ track 1 ip sla 1
 ---
 
 
-# Routing & DMVPN Design (Objective 1)
+# Routing 
+### DMVPN
 
-### mGRE tunnels:
+Each headquarters router provides an mGRE tunnel for branch connectivity.
 
-- mGRE tunnel is configured on the hub router as the transport network.
-- Spokes are configured with two tunnels one for R1 and the other for R2
-- EIGRP is used for internal reachability between HQ and branches  
-- **ECMP (Equal-Cost Multi-Path)** utilized to load-share traffic across both DMVPN tunnels  
+Branch routers establish tunnels to both hubs, providing redundancy and allowing Equal-Cost Multi-Path (ECMP) forwarding when both paths are available.
   
 ```bash
 HUB-ROUTER:
@@ -168,249 +181,101 @@ interface Tunnel0
  tunnel key 10
  tunnel protection ipsec profile crypt-profile
 
-
- ```
- ```bash
- SPOKE-ROUTER:
-
- interface Tunnel0
- ip address 192.168.0.6 255.255.255.0
- no ip redirects
- ip mtu 1400
- ip nhrp authentication dmvpnvpn
- ip nhrp network-id 10
- ip nhrp holdtime 300
- ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
- ip tcp adjust-mss 1360
- tunnel source Ethernet0/3
- tunnel mode gre multipoint
- tunnel key 10
- tunnel protection ipsec profile crypt-profile shared
-!
-interface Tunnel1
- ip address 192.168.1.6 255.255.255.0
- no ip redirects
- ip mtu 1400
- ip nhrp authentication dmvpnvpn
- ip nhrp network-id 20
- ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
- ip tcp adjust-mss 1360
- tunnel source Ethernet0/3
- tunnel mode gre multipoint
- tunnel key 20
- tunnel protection ipsec profile crypt-profile shared
- 
  ```
 
 ### EIGRP:
-EIGRP is used as the overlay routing protocol between the tunnel. 
-It is the protocol of choice dur its high convergence in GRE networks.
+EIGRP Named Mode is used as the overlay routing protocol between headquarters and branch sites.
 
-```bash
+The routing design provides:
 
-router eigrp EIGRP
- !
- address-family ipv4 unicast autonomous-system 100
-  !
-  af-interface Tunnel1
-   bandwidth-percent 25
-   no next-hop-self
-   no split-horizon
-  exit-af-interface
-  !
-  af-interface Ethernet0/0
-   passive-interface
-  exit-af-interface
-  !
-  topology base
-  exit-af-topology
-  network 172.16.255.0 0.0.0.255
-  network 192.168.1.0
- exit-address-family
- exit-address-family
- ```
+- Automatic route exchange
+- Fast convergence
+- Equal-cost load balancing
+- Dynamic route advertisement
 
 ---
-# Route filtering (Objective 2)
-In enterprise designs, we may want require only sites in a particular geographical loaction/region to only commnunicate with each other and the HQ, without inter-regional communications.
-This can be usesful when you may want routers in particular geographical regions to only contain those prefixes in that geographical region and hence reduce the size of the RIB.
+# Route filtering Route Filtering
 
-EiGRP can use filtering mechanisms to determine which routes are added in its RIB. Distribute lists are used to filter prefixes ingressing the router as shown.
-This is done in conjuction with prefix lists:
+Regional branches should only learn headquarters routes and routes within their own region.
 
-The snippet below for a router in Region A EIGRP filters  172.16.2.0/24, 172.16.3.0/24, 172.16.4.0/24 and 172.16.5.0/24 prefixes and allows all other prefixes (including HQ prefixes) to be added in the RIB
+Prefix Lists together with EIGRP distribute-lists are used to control route advertisement and reduce unnecessary entries in the routing table.
 
-```bash
-outer eigrp EIGRP
- !
- address-family ipv4 unicast autonomous-system 100
-  !
-  af-interface default
-   bandwidth-percent 25
-  exit-af-interface
-  !
-  topology base
-   distribute-list prefix EIGRP-filtered-prefixes in 
-  exit-af-topology
-  network 172.16.1.0 0.0.0.255
-  network 192.168.0.0
-  network 192.168.1.0
- exit-address-family
-!
-!
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.2.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.4.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
-
-```
+This approach improves scalability while keeping routing tables smaller on branch routers.
 
 ---
 
-# IPsec & Security (Objective 3)
+# Security
 
-- All DMVPN tunnels are secured using **IPsec**  
-- Ensures confidentiality, integrity, and authentication across the WAN  
-- Compatible with dual-hub redundant design  
+All DMVPN tunnels are protected using IPsec in transport mode.
 
-```bash
-crypto isakmp policy 100
- encr aes 192
- hash sha256
- authentication pre-share
- group 14
- lifetime 7200
-crypto isakmp key usestrongkey! address 0.0.0.0        
-!
-!
-crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
- mode transport
-!
-crypto ipsec profile crypt-profile
- set transform-set crypt-ts 
-!
- set transform-set crypto_ts 
-!
-```
+IPsec provides:
+
+- Encryption
+- Integrity checking
+- Peer authentication
+
+This ensures traffic remains protected between headquarters and branch offices, including spoke-to-spoke communication.
 ---
 
-# Automating the Network (Objective 4)
-Python uses netmiko libraries to automate network devices.
-Netmiko uses SSH as its southbound interface to login to devices and send confguration commands.
-Note: SSH must be enabled first for Netmiko to work.
+# Automation
 
-Onboarding a new spoke has been automated to allow for faster deployment of ner branch networks and minimize configuration errors
-The script can be seen here:
+Python and Netmiko are used to automate repetitive administrative tasks.
 
+Automation scripts included in this repository perform tasks such as:
 
-[Deploying new spoke](/deploying_new_spoke.py)
+- Deploying new branch routers
+- backing up startup configurations
+- Verifying configurations
 
-
-
-Below is a snippet that fetches the start-up configurations of all network devices:
-
+Example:- 
 ```python
-for Devices in chain(
-                      HQ_routers.values(), 
-                      Region_A.values(), 
-                      Region_B.values(), 
-                      Region_C.values()
-                    ):
-    c = ConnectHandler(**Devices)
-    c.enable()
-
-    hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
-    output = c.send_command('show startup-config')
-    print(output)
-
-```
-The above pyton script fetches the start-up configurations of all devices and prints them as output.
-
-### Verifying EIGRP routes:
-
-```python
-for devices in chain(
-                     HQ_routers.values(),
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()            
-                    ):
-  c = ConnectHandler(**devices)
-  c.enable()
-  hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
-  
-  output = c.send_command('show ip route eigrp','\n')
-  print(f'\n\n{hostname}\n,{output}')
+output = c.send_command("show startup-config")
 ```
 ---
 
-# Network Assurance (Objective 5)
-SNMP can be configured to send unsolicited traps to notify an NMS of important events such as interface up/down, device reboots, or threshold-based alerts (e.g. high CPU usage).
+# Network Monitoring
 
-An NMS (Network Management System) receives these traps and may also poll devices via SNMP to collect performance metrics like CPU and interface utilization, presenting the data in human-readable dashboards and graphs.
+The network is monitored centrally using PRTG.
 
-Examples of NMS platforms include PRTG and SolarWinds.
-Below is a snippet of SNMP configuration
+Routers export operational information through:
 
-```python
+- SNMP
+- NetFlow
+- Syslog
 
-for Devices in chain(
-                     HQ_routers.values(), 
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()      
-                    ):
-    c = ConnectHandler(**Devices)
-    c.enable()
+This allows administrators to monitor:
 
-    commands = [
-                'ip access-list standard snmp_acl',
-                'permit host 172.16.255.254',
-                'snmp-server community device_snmp snmp_acl',
-                'snmp-server system-shutdown',
-                'snmp-server enable traps config',
-                'snmp-server host 172.16.255.254 version 2c device_snmp'               
-               ]
-    print(c.send_config_set(commands))
-```
----
-# Centralized Services (Objective 6)
+- Device availability
+- CPU utilization
+- Memory usage
+- Interface bandwidth
+- Traffic flows
+- Network events
 
-- Each branch site maintains a local Internet connection  
-- Windows Server provides:
-  - DHCP and DNS for all branches  
-  - Network monitoring via **PRTG**  
+Centralized monitoring provides a single view of the network, making it easier to detect outages and troubleshoot problems.
 
-## Configuring Centralized DHCP (DHCP relay:)
-
-```python
-
-for Devices in chain(
-                     Region_A.values(), 
-                     Region_B.values(), 
-                     Region_C.values()
-                    ):
-    try:
-        c = ConnectHandler(**Devices)
-        c.enable()
-
-        hostname = c.send_command('show version', use_textfsm=True)[0]['hostname']
-
-        lan_intf = input(f'What is the LAN interface on {hostname} to be configured with DHCP relay? ')
-
-        commands = [f'interface {lan_intf}',
-                    'ip helper-address 172.16.255.254'
-                   ]
-        print(c.send_config_set(commands),'\n')
-        print(f'Router {hostname} has been configured with DHCP relay')
-        c.save_config()
-        c.disconnect()
-    except NetMikoTimeoutException:
-        print('Unable to connect. Check if SSH is enabled and the Network device is reachable!! ')
-    except Exception as e:
-        print(f'Error ,{e}')
-        exit()
-```
 ### Monitoring with PRTG:
 
 ![Topology](/PRTG.PNG)
 ---
+
+# Verification
+
+The following commands were used to validate the deployment.
+```bash
+show dmvpn
+
+show ip nhrp
+
+show ip route eigrp
+
+show ip eigrp neighbors
+
+show crypto isakmp sa
+
+show crypto ipsec sa
+
+show standby
+
+show track
+```
