@@ -1,7 +1,5 @@
 # Dual-Hub DMVPN Lab with IPsec
 
-# Dual-Hub DMVPN with IPsec
-
 This project implements a dual-hub DMVPN Phase II WAN secured with IPsec. The topology simulates an enterprise network with geographically distributed branch offices connected to redundant headquarters hubs using EIGRP.
 
 
