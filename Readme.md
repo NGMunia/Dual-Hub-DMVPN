@@ -19,7 +19,15 @@ The objectives of this project are to:
 ![Routing](https://img.shields.io/badge/Routing-EIGRP-orange)
 
 ---
+
+## Lab Architecture
+The topology consists of two headquarters routers operating as redundant DMVPN hubs and multiple branch routers connected over the Internet.
+
+Each branch establishes tunnels to both hubs using mGRE and NHRP. EIGRP provides routing across the overlay while IPsec encrypts all tunnel traffic.
+
 ![Topology](/Topology.png)
+
+---
 
 ## Why DMVPN?
 
@@ -62,15 +70,6 @@ This lab project demostrates dual-hub DMVPN design with the following:
 | Syslog | Centralized Logging |
 | PRTG | Network Monitoring |
 | Windows Server | DHCP, DNS and Monitoring |
-
----
-
-## Lab Architecture
-The topology consists of two headquarters routers operating as redundant DMVPN hubs and multiple branch routers connected over the Internet.
-
-Each branch establishes tunnels to both hubs using mGRE and NHRP. EIGRP provides routing across the overlay while IPsec encrypts all tunnel traffic.
-
-
 
 ---
 # IP SLA and Object Tracking
