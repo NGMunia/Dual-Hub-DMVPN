@@ -14,7 +14,7 @@ while True:
         print('Login successful!!')
         break
     else:
-        print("incorrect username and/or password!!")
+        print("Incorrect username and/or password!!")
         Username = input('Username: ')
         password = getpass('password: ')
         enable_password = getpass('enable password: ')

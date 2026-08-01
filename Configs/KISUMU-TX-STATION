@@ -1,6 +1,6 @@
-Using 3635 out of 32768 bytes
+Using 4040 out of 131072 bytes
 !
-! Last configuration change at 09:02:56 UTC Fri Feb 27 2026 by Automation
+! Last configuration change at 13:20:37 UTC Sat Aug 1 2026 by Automation
 !
 version 15.7
 service timestamps debug datetime msec
@@ -13,12 +13,15 @@ boot-start-marker
 boot-end-marker
 !
 !
-enable secret 5 $1$kELj$t3kgc50Wed4Z0Jnby32qk.
+logging discriminator EXCESS severity drops 6 msg-body drops EXCESSCOLL 
+logging buffered 50000
+logging console discriminator EXCESS
+enable secret 8 $8$lYQxMiVZ5028vj$Sy5h9x5OqzJIUAYnH8y6pIFurma9HrEkl0FRCNiNbTY
 !
 aaa new-model
 !
 !
-aaa authentication login default local enable
+aaa authentication login default local-case enable
 !
 !
 !
@@ -28,6 +31,7 @@ aaa session-id common
 !
 !
 !
+process cpu threshold type total rising 80 interval 60 falling 60 interval 60
 mmi polling-interval 60
 no mmi auto-configure
 no mmi pvc
@@ -55,7 +59,7 @@ no ip icmp rate-limit unreachable
 !
 !
 no ip domain lookup
-ip domain name munia.gns3
+ip domain name munia.local
 ip cef
 no ipv6 cef
 !
@@ -69,11 +73,10 @@ multilink bundle-name authenticated
 !
 !
 !
-username Automation secret 8 $8$bC2GiF8bbFw.eD$8okIWBqX322nsUr0YZae8eN4b.l72sU4sG9a0S3X54A
+username Automation secret 8 $8$tL9smxiRWI/cYz$9n1jipSAFoSGWac9M8x6VfiAm.3y5gZptrr1dXYJvAM
 !
 redundancy
 !
-no cdp log mismatch duplex
 !
 ip tcp synwait-time 5
 ! 
@@ -82,15 +85,15 @@ ip tcp synwait-time 5
 !
 !
 crypto isakmp policy 100
- encr aes 192
+ encr aes 256
  hash sha256
  authentication pre-share
  group 14
  lifetime 7200
-crypto isakmp key usestrongkey! address 0.0.0.0        
+crypto isakmp key strongkey! address 0.0.0.0        
 !
 !
-crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha512-hmac 
+crypto ipsec transform-set crypt-ts esp-aes 256 esp-sha256-hmac 
  mode transport
 !
 crypto ipsec profile crypt-profile
@@ -103,13 +106,13 @@ crypto ipsec profile crypt-profile
 !
 !
 interface Tunnel0
- ip address 192.168.0.6 255.255.255.0
+ ip address 172.19.10.6 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 10
  ip nhrp holdtime 300
- ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
+ ip nhrp nhs 172.19.10.1 nbma 32.19.86.10 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -117,12 +120,13 @@ interface Tunnel0
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Tunnel1
- ip address 192.168.1.6 255.255.255.0
+ ip address 172.19.20.6 255.255.255.0
  no ip redirects
  ip mtu 1400
  ip nhrp authentication dmvpnvpn
  ip nhrp network-id 20
- ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
+ ip nhrp holdtime 300
+ ip nhrp nhs 172.19.20.1 nbma 32.19.86.20 multicast
  ip tcp adjust-mss 1360
  tunnel source Ethernet0/3
  tunnel mode gre multipoint
@@ -130,18 +134,16 @@ interface Tunnel1
  tunnel protection ipsec profile crypt-profile shared
 !
 interface Ethernet0/0
- ip address 172.16.4.1 255.255.255.0
- ip helper-address 172.16.255.254
+ ip address 192.168.50.1 255.255.255.0
+ ip helper-address 192.168.11.100
  duplex auto
 !
 interface Ethernet0/1
  no ip address
- shutdown
  duplex auto
 !
 interface Ethernet0/2
  no ip address
- shutdown
  duplex auto
 !
 interface Ethernet0/3
@@ -160,11 +162,11 @@ router eigrp EIGRP
   exit-af-interface
   !
   topology base
-   distribute-list prefix EIGRP-filtered-prefixes in 
+   distribute-list prefix filtered-prefixes in 
   exit-af-topology
-  network 172.16.4.0 0.0.0.255
-  network 192.168.0.0
-  network 192.168.1.0
+  network 172.19.10.0 0.0.0.255
+  network 172.19.20.0 0.0.0.255
+  network 192.168.50.0
  exit-address-family
 !
 ip forward-protocol nd
@@ -175,19 +177,24 @@ no ip http secure-server
 ip route 0.0.0.0 0.0.0.0 Ethernet0/3 32.19.86.1
 ip ssh version 2
 !
-ip access-list standard snmp_acl
- permit 172.16.255.254
+ip access-list standard SNMP-ACL
+ permit 192.168.21.100
 !
 !
-ip prefix-list EIGRP-filtered-prefixes seq 5 deny 172.16.0.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 10 deny 172.16.2.0/23 ge 24
-ip prefix-list EIGRP-filtered-prefixes seq 15 permit 0.0.0.0/0 le 32
+ip prefix-list filtered-prefixes seq 5 permit 192.168.11.0/24
+ip prefix-list filtered-prefixes seq 10 permit 192.168.21.0/24
+ip prefix-list filtered-prefixes seq 15 permit 192.168.51.0/24
 ipv6 ioam timestamp
 !
-snmp-server community device_snmp RO snmp_acl
+snmp-server community DEVICE-SNMP RO SNMP-ACL
+snmp-server trap-source Ethernet0/0
+snmp-server chassis-id KISUMU-TX-STATION
 snmp-server system-shutdown
+snmp-server enable traps eigrp
+snmp-server enable traps memory bufferpeak
 snmp-server enable traps config
-snmp-server host 172.16.255.254 version 2c device_snmp 
+snmp-server enable traps cpu threshold
+snmp-server host 192.168.21.100 version 2c DEVICE-SNMP 
 !
 !
 !
@@ -203,7 +210,7 @@ control-plane
 banner login ^C
 ##################################################
 #  KISUMU-TX-STATION
-#  ROYAL MEDIA SERVICES LIMITED
+#  BROADCAST MEDIA SERVICES LTD
 #  BROADCAST TRANSMISSION DEPARTMENT
 #  Unauthorized access is strictly forbidden
 ##################################################
@@ -219,6 +226,7 @@ line aux 0
  logging synchronous
 line vty 0 4
  logging synchronous
+ monitor
  transport input ssh
 !
 !

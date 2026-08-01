@@ -8,14 +8,14 @@ HQ_routers = {
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'172.16.255.1'
+                         'ip':'192.168.21.1'
                        },
              'R2_HUB': {
                          'device_type':'cisco_ios',
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'172.16.255.2'
+                         'ip':'192.168.21.2'
                        }
            }
 Region_A = {
@@ -24,16 +24,16 @@ Region_A = {
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.2',
-                         'ip':'192.168.1.2'
+                         'ip':'172.19.10.2',
+                         'ip':'172.19.20.2'
                        },
              'R4': {
                          'device_type':'cisco_ios',
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.3',
-                         'ip':'192.168.1.3'
+                         'ip':'172.19.10.3',
+                         'ip':'172.19.20.3'
                        }
             }
 Region_B =  {
@@ -42,16 +42,16 @@ Region_B =  {
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.4',
-                         'ip':'192.168.1.4'
+                         'ip':'172.19.10.4',
+                         'ip':'172.19.20.4'
                        },
               'R6': {
                          'device_type':'cisco_ios',
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.5',
-                         'ip':'192.168.1.5'
+                         'ip':'172.19.10.5',
+                         'ip':'172.19.20.5'
                        },
             }
 Region_C =  {
@@ -62,35 +62,15 @@ Region_C =  {
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.6',
-                         'ip':'192.168.1.6'
+                         'ip':'172.19.10.6',
+                         'ip':'172.19.20.6'
                        },
              'R8': {
                          'device_type':'cisco_ios',
                          'username':Username,
                          'password': password,
                          'secret':enable_password,
-                         'ip':'192.168.0.7',
-                         'ip':'192.168.1.7'
-                        } 
-            }
-Region_D =  {
-    
-          
-             'R9': {
-                         'device_type':'cisco_ios',
-                         'username':Username,
-                         'password': password,
-                         'secret':enable_password,
-                         'ip':'192.168.0.9',
-                         'ip':'192.168.1.9'
-                       },
-            'R10': {
-                         'device_type':'cisco_ios',
-                         'username':Username,
-                         'password': password,
-                         'secret':enable_password,
-                         'ip':'192.168.0.10',
-                         'ip':'192.168.1.10'
+                         'ip':'172.19.10.7',
+                         'ip':'172.19.20.7'
                         } 
             }

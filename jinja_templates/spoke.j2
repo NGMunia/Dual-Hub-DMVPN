@@ -8,7 +8,7 @@ ip mtu 1400
 ip nhrp authentication dmvpnvpn
 ip nhrp network-id 10
 ip nhrp holdtime 300
-ip nhrp nhs 192.168.0.1 nbma 32.19.86.9 multicast
+ip nhrp nhs 172.19.10.1 nbma 32.19.86.10 multicast
 ip tcp adjust-mss 1360
 tunnel source {{tunnel0_source_ip}}
 tunnel mode gre multipoint
@@ -19,8 +19,9 @@ ip address {{tunnel1_ip}} 255.255.255.0
 no ip redirects
 ip mtu 1400
 ip nhrp authentication dmvpnvpn
+ip nhrp holdtime 300
 ip nhrp network-id 20
-ip nhrp nhs 192.168.1.1 nbma 32.19.86.10 multicast
+ip nhrp nhs 172.19.20.1 nbma 32.19.86.20 multicast
 ip tcp adjust-mss 1360
 tunnel source {{tunnel0_source_ip}}
 tunnel mode gre multipoint
