@@ -57,7 +57,6 @@ This lab project demostrates dual-hub DMVPN design with the following:
 
 | Technology | Purpose |
 |------------|----------|
-| Cisco IOS | Routing and Switching |
 | DMVPN Phase II | WAN Overlay |
 | IPsec | Tunnel Encryption |
 | EIGRP Named Mode | Dynamic Routing |
@@ -66,10 +65,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 | Object Tracking | Automatic Failover |
 | Python & Netmiko | Automation |
 | SNMP | Device Monitoring |
-| NetFlow | Traffic Analysis |
-| Syslog | Centralized Logging |
 | PRTG | Network Monitoring |
-| Windows Server | DHCP, DNS and Monitoring |
 
 ---
 # IP SLA and Object Tracking
@@ -145,6 +141,7 @@ IPsec provides:
 - Peer authentication
 
 This ensures traffic remains protected between headquarters and branch offices, including spoke-to-spoke communication.
+
 ---
 
 # Automation
