@@ -120,7 +120,7 @@ The routing design provides:
 - Dynamic route advertisement
 
 ---
-# Route filtering Route Filtering
+# Route filtering
 
 Regional branches should only learn headquarters routes and routes within their own region.
 
