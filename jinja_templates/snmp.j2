@@ -1,7 +1,13 @@
 
-ip access-list standard snmp_acl
+process cpu threshold type total rising 80 interval 60 falling 60 interval 60
+ip access-list standard SNMP-ACL
   permit host {{snmp_server_ip}}
-snmp-server community device_snmp snmp_acl
+snmp-server community DEVICE-SNMP SNMP-ACL
+snmp-server trap-source {{snmp_interface}}
+snmp-server chassis-id {{chassis_id}}
 snmp-server system-shutdown
 snmp-server enable traps config
-snmp-server host {{snmp_server_ip}} version 2c device_snmp
+snmp-server enable traps eigrp
+snmp-server enable traps cpu threshold
+snmp-server enable traps memory 
+snmp-server host {{snmp_server_ip}} version 2c DEVICE-SNMP

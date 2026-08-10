@@ -80,10 +80,10 @@ try:
 
 
 # Configuring the DMVPN tunnels:
-    print('-----CONFIGURING THE TUNNELS OF THE NEW SPOKE-----')
+    print('-----CONFIGURING THE TUNNELS OF THE NEW SPOKE;THE CONFIG USES A SINGLE SOURCE INTERFACE FOR THE TUNNELS-----')
     while True:
         try: 
-            tunnel0_source_IP = input(f'whats the tunnel source IP/interface of {hostname} gateway? ')
+            tunnel0_source_IP = input(f'whats the tunnel(s) source IP/interface of {hostname} gateway? ')
 
             tunnel0_ip = input(f'Whats the IP address of tunnel0 of {hostname} gateway?  ')
             ipaddress.IPv4Address(tunnel0_ip)
@@ -121,6 +121,7 @@ try:
     intf_commands = [
                       f'interface {intf}',
                       f'ip address {ip} 255.255.255.0',
+                       'ip helper-address 192.168.11.100', #This is the DHCP/DNS server IP address
                        'no shut'
                     ]    
     print(c.send_config_set(intf_commands),'\n')
@@ -139,8 +140,8 @@ try:
                        'af-interface default',
                        'bandwidth-percent 25',
                       f'network {lan_network}',
-                       'network 192.168.1.0',
-                       'network 192.168.0.0'
+                       'network 172.19.10.0 0.0.0.255', #This is tunnel0 overlay address
+                       'network 172.19.20.0 0.0.0.255'  #This is tunnel1 overlay address
                      ]    
     print(c.send_config_set(eigrp_commands),'\n')
 
@@ -160,9 +161,15 @@ try:
 
 # Configuring SNMP SERVER
 # - This script configures the NMS server where SNMP traps will be sent.
-    print('-----Configuring SNMP server on the spoke-----')
+    print('-----Configuring SNMP on the spoke-----')
     snmp_server = input('What is the IP address of SNMP Server?  ')
-    data = {'snmp_server_ip':snmp_server } 
+    snmp_intf = input('What is the SNMP traps source interface? ')
+    chassis_id = c.send_command('show version', use_textfsm=True)[0]['hostname']
+
+    data = {'snmp_server_ip':snmp_server,
+            'snmp_interface':snmp_intf,
+            'chassis_id':chassis_id 
+           } 
 
     env = Environment(loader=FileSystemLoader(jinja_templates))
     template = env.get_template("snmp.j2") 
