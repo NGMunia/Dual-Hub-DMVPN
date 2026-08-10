@@ -14,11 +14,11 @@ The objectives of this project are to:
 - Automate repetitive configuration tasks using Python
 
 ![DMVPN](https://img.shields.io/badge/DMVPN-Phase2-blue)
-![IPsec](https://img.shields.io/badge/IPsec-Secure-red)
+![Security](https://img.shields.io/badge/Security-IPsec-red)
 ![Automation](https://img.shields.io/badge/Automation-Python-green)
 ![Routing](https://img.shields.io/badge/Routing-EIGRP-orange)
 
----
+
 
 ## Lab Architecture
 The topology consists of two headquarters routers operating as redundant DMVPN hubs and multiple branch routers connected over the Internet.
@@ -27,7 +27,7 @@ Each branch establishes tunnels to both hubs using mGRE and NHRP. EIGRP provides
 
 ![Topology](/Topology.png)
 
----
+
 
 ## Why DMVPN?
 
@@ -52,7 +52,7 @@ This lab project demostrates dual-hub DMVPN design with the following:
 - **Monitoring:** PRTG, SNMP, NetFlow  
 - **Services:** Centralized DHCP, DNS,NTP 
 
----
+
 ## Technologies used:
 
 | Technology | Purpose |
@@ -71,8 +71,8 @@ This lab project demostrates dual-hub DMVPN design with the following:
 | PRTG | Network Monitoring |
 | Windows Server | DHCP, DNS and Monitoring |
 
----
-# IP SLA and Object Tracking
+
+## IP SLA and Object Tracking
 
 IP SLA monitors reachability to the ISP using ICMP probes. Object Tracking monitors the IP SLA operation and adjusts the VRRP priority if connectivity is lost.
 
@@ -85,10 +85,10 @@ The failover process is:
 - The standby router becomes the Master.
 - Traffic automatically switches to the new gateway.
 
----
 
 
-# Routing 
+
+## Routing 
 ### DMVPN
 
 Each headquarters router provides an mGRE tunnel for branch connectivity.
@@ -123,8 +123,9 @@ The routing design provides:
 - Equal-cost load balancing
 - Dynamic route advertisement
 
----
-# Route filtering Route Filtering
+
+
+## Route filtering
 
 Regional branches should only learn headquarters routes and routes within their own region.
 
@@ -132,9 +133,9 @@ Prefix Lists together with EIGRP distribute-lists are used to control route adve
 
 This approach improves scalability while keeping routing tables smaller on branch routers.
 
----
 
-# Security
+
+## Security
 
 All DMVPN tunnels are protected using IPsec in transport mode.
 
@@ -145,9 +146,9 @@ IPsec provides:
 - Peer authentication
 
 This ensures traffic remains protected between headquarters and branch offices, including spoke-to-spoke communication.
----
 
-# Automation
+
+## Automation
 
 Python and Netmiko are used to automate repetitive administrative tasks.
 
@@ -161,9 +162,8 @@ Example:-
 ```python
 output = c.send_command("show startup-config")
 ```
----
 
-# Network Monitoring
+## Network Monitoring
 
 The network is monitored centrally using PRTG.
 
@@ -187,9 +187,9 @@ Centralized monitoring provides a single view of the network, making it easier t
 ### Monitoring with PRTG:
 
 ![Topology](/PRTG.PNG)
----
 
-# Verification
+
+## Verification
 
 The following commands were used to validate the deployment.
 ```bash
