@@ -119,8 +119,9 @@ The routing design provides:
 - Equal-cost load balancing
 - Dynamic route advertisement
 
----
-# Route filtering Route Filtering
+
+
+## Route filtering Route Filtering
 
 Regional branches should only learn headquarters routes and routes within their own region.
 
@@ -139,9 +140,9 @@ IPsec provides:
 - Encryption
 - Integrity checking
 - Peer authentication
-
 This ensures traffic remains protected between headquarters and branch offices, including spoke-to-spoke communication.
----
+
+
 
 ## Automation
 
